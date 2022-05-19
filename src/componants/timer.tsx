@@ -2,17 +2,18 @@ import React, { useEffect, useState } from 'react';
 import IPage from '../interfaces/page';
 import logging from '../config/logging';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import "./../pages/index.css";
+import "./timer.css";
 
 type TimerProps = {
-    oexercise_time : number,
-    orest_time : number,
-    ocycles : number,
-    orecovery_time : number,
-    oexercise : string[],
+    Prop_exercise_time : number,
+    Prop_rest_time : number,
+    Prop_cycles : number,
+    Prop_recovery_time : number,
+    Prop_exercise : string[],
+    Prop_name : string,
   }
 
-const Timer = ( {oexercise_time,orest_time,ocycles,orecovery_time,oexercise} : TimerProps) => {
+const Timer = ( {Prop_exercise_time,Prop_rest_time,Prop_cycles,Prop_recovery_time,Prop_exercise,Prop_name} : TimerProps) => {
     
     const TIME_LIMIT = 15; 
     let timerInterval = 0;
@@ -23,9 +24,16 @@ const Timer = ( {oexercise_time,orest_time,ocycles,orecovery_time,oexercise} : T
     //DOM elements
     let timer = document.querySelector("#base-timer-path-remaining")as HTMLElement;
     let timeLabel = document.getElementById("base-timer-label") as HTMLElement;
+    let setslabel = document.getElementById("sets") as HTMLElement;
+    let cyclelabel = document.getElementById("cycles") as HTMLElement;
+    let exerciceslabel = document.getElementById("exercices") as HTMLElement;
+
     //All buttons
-    let startBtn = document.querySelector(".start")as HTMLButtonElement;
-    let stopBtn = document.querySelector(".stop") as HTMLButtonElement;
+    let startBtn = document.getElementById("start")as HTMLButtonElement;
+    let stopBtn = document.getElementById("stop") as HTMLButtonElement;
+
+
+
 
     function setDisabled(button : HTMLButtonElement) {
         button.setAttribute("disabled", "disabled");
@@ -57,6 +65,9 @@ const Timer = ( {oexercise_time,orest_time,ocycles,orecovery_time,oexercise} : T
         cycles : number = 1;
         recovery_time : number = 0;
         exercise : string[] = [];
+
+        _cycle : number = 0;
+        _set : number = 0;
        
         constructor(exercise_time : number, rest_time : number, cycles : number, recovery_time : number, exercise : string[])
         {
@@ -99,10 +110,16 @@ const Timer = ( {oexercise_time,orest_time,ocycles,orecovery_time,oexercise} : T
             if (this.timers.length > 0)
             {
                 const timer = this.timers.pop();
-                console.log('runing : ' + timer?.timer.toString())
+                if(timer?.name)
+                {
+                    exerciceslabel.innerHTML = timer.name;
+                }
+                else{
+                    exerciceslabel.innerHTML = "";
+                }
+                console.log('runing : ' + timer?.type.toString())
                 let i = timer?.timer;
                 timerInterval = window.setInterval(() => { 
-                    console.log(timerInterval);
                     if(!pa)
                     {
                         if (timer?.timer && timeLabel && i != null && i > 0)
@@ -114,6 +131,22 @@ const Timer = ( {oexercise_time,orest_time,ocycles,orecovery_time,oexercise} : T
                         else if(timer && timeLabel && i != null)
                         {
                             timeLabel.innerHTML = this.formatTime(i);
+                            
+
+                            if(timer.type == TYPE_TIMER.Exo)
+                            {
+                                this._set+=1;
+                               cyclelabel.innerHTML = this._cycle.toString() + "/" + this.cycles.toString();
+                               setslabel.innerHTML = this._set.toString() + "/" + this.exercise.length.toString();  
+                            }
+                            else if(timer.type == TYPE_TIMER.Recovery)
+                            {
+                                this._cycle +=1;
+                                this._set=1;
+                                cyclelabel.innerHTML = this._cycle.toString() + "/" + this.cycles.toString();
+                                setslabel.innerHTML = this._set.toString() + "/" + this.exercise.length.toString();
+                            }
+                           
                             window.clearInterval(timerInterval);
                             this.timerOn();
                         }
@@ -132,15 +165,17 @@ const Timer = ( {oexercise_time,orest_time,ocycles,orecovery_time,oexercise} : T
                     // play the rest
                     if (exo < this.exercise.length - 1)
                     { 
-                        this.timers.unshift({timer : this.rest_time, type : TYPE_TIMER.Rest});
+                        this.timers.unshift({timer : this.rest_time, type : TYPE_TIMER.Rest, name : "Rest"});
                     }
                 }
                 // play the recovery
                 if (cycle < this.cycles - 1)
                 {
-                    this.timers.unshift({timer : this.recovery_time, type : TYPE_TIMER.Recovery});
+                    this.timers.unshift({timer : this.recovery_time, type : TYPE_TIMER.Recovery, name : "Recovery"});
                 }
             }
+            cyclelabel.innerHTML = "0/" + this.cycles.toString();
+            setslabel.innerHTML = "0/" + this.exercise.length.toString();
             this.timerOn();
         }
     }
@@ -154,15 +189,18 @@ const Timer = ( {oexercise_time,orest_time,ocycles,orecovery_time,oexercise} : T
             timer = document.querySelector("#base-timer-path-remaining")as HTMLElement;
             timeLabel = document.getElementById("base-timer-label") as HTMLElement;
             //All buttons
-            startBtn = document.querySelector(".start")as HTMLButtonElement;
-            stopBtn = document.querySelector(".stop") as HTMLButtonElement; 
+            startBtn = document.getElementById("start")as HTMLButtonElement;
+            stopBtn = document.getElementById("stop") as HTMLButtonElement; 
+            setslabel = document.getElementById("sets") as HTMLElement;
+            cyclelabel = document.getElementById("cycles") as HTMLElement;
+            exerciceslabel = document.getElementById("exercices") as HTMLElement;
         }
 
         setDisabled(startBtn);
         removeDisabled(stopBtn);
         if (!pa)
         {
-            new Trainning(oexercise_time, 3, 2, 10, ["exo1", "exo2", "exo3"]).play();
+            new Trainning(Prop_exercise_time, Prop_rest_time, Prop_cycles, Prop_recovery_time, Prop_exercise).play();
         }
         pa = false;
     }
@@ -186,9 +224,10 @@ const Timer = ( {oexercise_time,orest_time,ocycles,orecovery_time,oexercise} : T
       }
 
     return (
-        <div>
-           <div className="base-chrono" id="app">
-                <div className="base-timer">
+        <div >
+        <h1 className='h1time'>{Prop_name}</h1>
+           <div className="base-chrono" id="app"> 
+                <div className="base-timer">  
                   <svg className="base-timer__svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                     <g className="base-timer__circle">
                       <circle className="base-timer__path-elapsed" cx="50" cy="50" r="45"></circle>
@@ -201,17 +240,37 @@ const Timer = ( {oexercise_time,orest_time,ocycles,orecovery_time,oexercise} : T
                                "></path>
                     </g>
                   </svg>
+
+
+
+                  <header>
+    <div className="session">
+      <div className="breakCtrl">
+        <p>Sets</p>
+        <span className="time" id="sets">0/0</span>
+
+      </div>
+      <div className="sessionCtrl">
+        <p>Cycles</p>
+        <span className="time" id="cycles">0/0</span>
+      </div>
+    </div>
+  </header>
+              
                   <span id="base-timer-label" className="base-timer__label">0:00</span>
+                  <span id="base-timer-label2" className="base-timer__label2">0:00</span>
                 </div>
               
+                <h2 className='h2time' id="exercices">Exercise 1</h2>
+
               <div className="buttons">
-                <button onClick={e => start()} className="start" id="start">
+                <button onClick={e => start()} className="bttn" id="start">
                   Start
                 </button>
-                <button onClick={e => stopp()} className="stop" id="stop">
+                <button onClick={e => stopp()} className="bttn" id="stop">
                   Stop
                 </button>
-                <button onClick={e => reset()} className="reset" id="reset">
+                <button onClick={e => reset()} className="bttn" id="reset">
                   Reset
                 </button>
               </div>

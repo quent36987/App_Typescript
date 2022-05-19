@@ -2,7 +2,8 @@
     "days" :
 
     [ {
-    "day": 1,
+    "name": "Day 1",
+    "description": "On commence par un tabata",
     "exercise_time" : 5, 
     "rest_time" : 3,
     "cycles" : 2,
@@ -10,7 +11,28 @@
     "exercise" : ["squat", "deadlift", "bench press"]
     },
     {
-        "day": 2,
+        "name": "Day 2",
+        "description": "pyramide pour garder la forme",
+        "exercise_time" : 4,
+        "rest_time" : 4,
+        "cycles" : 5,
+        "recovery_time" : 5,
+        "exercise" : ["squat2", "deadlift2", "bench press2"]
+    }
+    ,
+    {
+        "name": "Day 3",
+        "description": "pyramide pour garder la forme",
+        "exercise_time" : 4,
+        "rest_time" : 4,
+        "cycles" : 2,
+        "recovery_time" : 5,
+        "exercise" : ["squat2", "deadlift2", "bench press2"]
+    }
+    ,
+    {
+        "name": "Echauffement rapide",
+        "description": "pyramide pour garder la forme",
         "exercise_time" : 4,
         "rest_time" : 4,
         "cycles" : 2,
