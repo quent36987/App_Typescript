@@ -1,0 +1,23 @@
+{
+    "days" :
+
+    [ {
+    "day": 1,
+    "exercise_time" : 5, 
+    "rest_time" : 3,
+    "cycles" : 2,
+    "recovery_time" : 10,
+    "exercise" : ["squat", "deadlift", "bench press"]
+    },
+    {
+        "day": 2,
+        "exercise_time" : 4,
+        "rest_time" : 4,
+        "cycles" : 2,
+        "recovery_time" : 5,
+        "exercise" : ["squat2", "deadlift2", "bench press2"]
+    }
+    ]
+
+
+}

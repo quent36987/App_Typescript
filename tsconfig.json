@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "outDir": "dist",
+        "noEmitOnError": true,
+        "strict": false,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "module": "commonjs",
+        "target": "ES6",
+        "moduleResolution": "node",
+        "types" : ["node"],
+        "typeRoots": [
+            "node_modules/@types"
+        ],
+        
+    },
+    "files": [
+        "src/app.ts",
+        "src/app2.ts",
+    ],
+    "include": [
+        "src/bd/days.json",
+    ],
+
+
+}
