@@ -1,2 +1,1 @@
-# App_Typescript
-petit projet pour apprendre a coder en ts
+This project is intended to get you off and running with React, React Router and Typescript!

@@ -1,17 +1,16 @@
-body {
-  box-sizing: border-box;
-  font-family: monospace;
-  display: grid;
-  height: 90vh;
-  place-items: center;
- }
 
 .base-timer {
   position: relative;
   width: 300px;
   height: 300px;
 }
-
+.base-chrono{
+  box-sizing: border-box;
+  font-family: monospace;
+  display: grid;
+  height: 90vh;
+  place-items: center;
+}
 /* scaleX(1) = CLOCKWISE, scaleX(-1) = ANTI-CLOCKWISE */
 .base-timer__svg {
   transform: scaleX(1);
