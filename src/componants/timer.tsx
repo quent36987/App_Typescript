@@ -1,38 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import IPage from '../interfaces/page';
-import logging from '../config/logging';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import React, { useState } from 'react';
 import "./timer.css";
 
-type TimerProps = {
-    Prop_exercise_time : number,
-    Prop_rest_time : number,
-    Prop_cycles : number,
-    Prop_recovery_time : number,
-    Prop_exercise : string[],
-    Prop_name : string,
+export type TimerProps = {
+    exercise_time : number,
+    rest_time : number,
+    cycles : number,
+    recovery_time : number,
+    exercise : string[],
+    name : string,
   }
 
-const Timer = ( {Prop_exercise_time,Prop_rest_time,Prop_cycles,Prop_recovery_time,Prop_exercise,Prop_name} : TimerProps) => {
-    
-    const TIME_LIMIT = 15; 
-    let timerInterval = 0;
-    let pa = false;
+function Timer  ( Prop : TimerProps)  {
+    const [cycle, setCycle] = useState("0/0");
+
+    //const
     const FULL_DASH_ARRAY = 283;
     const RESET_DASH_ARRAY = `-57 ${FULL_DASH_ARRAY}`;
+
+    //state
+    let timerInterval = 0;
+    let is_pause = false;
 
     //DOM elements
     let timer = document.querySelector("#base-timer-path-remaining")as HTMLElement;
     let timeLabel = document.getElementById("base-timer-label") as HTMLElement;
     let setslabel = document.getElementById("sets") as HTMLElement;
-    let cyclelabel = document.getElementById("cycles") as HTMLElement;
     let exerciceslabel = document.getElementById("exercices") as HTMLElement;
 
     //All buttons
     let startBtn = document.getElementById("start")as HTMLButtonElement;
     let stopBtn = document.getElementById("stop") as HTMLButtonElement;
-
-
 
 
     function setDisabled(button : HTMLButtonElement) {
@@ -69,13 +66,14 @@ const Timer = ( {Prop_exercise_time,Prop_rest_time,Prop_cycles,Prop_recovery_tim
         _cycle : number = 0;
         _set : number = 0;
        
-        constructor(exercise_time : number, rest_time : number, cycles : number, recovery_time : number, exercise : string[])
+        constructor(val : TimerProps)
         {
-            this.exercise_time = exercise_time;
-            this.rest_time = rest_time;
-            this.cycles = cycles;
-            this.exercise = exercise;
-            this.recovery_time = recovery_time;
+            this.exercise_time = val.exercise_time;
+            this.rest_time = val.rest_time;
+            this.cycles = val.cycles;
+            this.exercise = val.exercise;
+            this.recovery_time = val.recovery_time;
+            //setCycle(this._cycle.toString()+"/" + this.cycles.toString());
         }
     
         //get the time total in seconds
@@ -107,46 +105,47 @@ const Timer = ( {Prop_exercise_time,Prop_rest_time,Prop_cycles,Prop_recovery_tim
     
         timerOn()
         {
+            console.log("timerOn");
             if (this.timers.length > 0)
             {
                 const timer = this.timers.pop();
-                if(timer?.name)
-                {
+                let i = -1;
+                if(timer?.name && timeLabel){
                     exerciceslabel.innerHTML = timer.name;
+                    i = timer.timer;
                 }
                 else{
                     exerciceslabel.innerHTML = "";
                 }
-                console.log('runing : ' + timer?.type.toString())
-                let i = timer?.timer;
+        
                 timerInterval = window.setInterval(() => { 
-                    if(!pa)
+                    if(!is_pause)
                     {
-                        if (timer?.timer && timeLabel && i != null && i > 0)
+                        
+                        console.log("pause :" +  is_pause);
+                        if (timer?.timer  && i !== -1 && i > 0)
                         {
                             this.setCircleDasharray(i,timer.timer);
                             timeLabel.innerHTML = this.formatTime(i);
                             i--;
                         }
-                        else if(timer && timeLabel && i != null)
+                        else if(timer  && i !== -1)
                         {
-                            timeLabel.innerHTML = this.formatTime(i);
                             
-
-                            if(timer.type == TYPE_TIMER.Exo)
-                            {
+                            timeLabel.innerHTML = this.formatTime(i);
+                            if(timer.type === TYPE_TIMER.Exo)
+                            {   
                                 this._set+=1;
-                               cyclelabel.innerHTML = this._cycle.toString() + "/" + this.cycles.toString();
+                                setCycle(this._cycle.toString()+"/" + this.cycles.toString());
                                setslabel.innerHTML = this._set.toString() + "/" + this.exercise.length.toString();  
                             }
-                            else if(timer.type == TYPE_TIMER.Recovery)
+                            else if(timer.type === TYPE_TIMER.Recovery)
                             {
                                 this._cycle +=1;
                                 this._set=1;
-                                cyclelabel.innerHTML = this._cycle.toString() + "/" + this.cycles.toString();
+                                setCycle(this._cycle.toString()+"/" + this.cycles.toString());
                                 setslabel.innerHTML = this._set.toString() + "/" + this.exercise.length.toString();
                             }
-                           
                             window.clearInterval(timerInterval);
                             this.timerOn();
                         }
@@ -154,7 +153,6 @@ const Timer = ( {Prop_exercise_time,Prop_rest_time,Prop_cycles,Prop_recovery_tim
                 }, 1000);
             }
         }
-    
         // play the tabata (timer)
         play()
         {
@@ -174,15 +172,15 @@ const Timer = ( {Prop_exercise_time,Prop_rest_time,Prop_cycles,Prop_recovery_tim
                     this.timers.unshift({timer : this.recovery_time, type : TYPE_TIMER.Recovery, name : "Recovery"});
                 }
             }
-            cyclelabel.innerHTML = "0/" + this.cycles.toString();
+            
             setslabel.innerHTML = "0/" + this.exercise.length.toString();
             this.timerOn();
+           
         }
     }
 
 
     function start() { 
-
         if (!startBtn)
         {
            //DOM elements
@@ -192,24 +190,23 @@ const Timer = ( {Prop_exercise_time,Prop_rest_time,Prop_cycles,Prop_recovery_tim
             startBtn = document.getElementById("start")as HTMLButtonElement;
             stopBtn = document.getElementById("stop") as HTMLButtonElement; 
             setslabel = document.getElementById("sets") as HTMLElement;
-            cyclelabel = document.getElementById("cycles") as HTMLElement;
             exerciceslabel = document.getElementById("exercices") as HTMLElement;
         }
 
         setDisabled(startBtn);
         removeDisabled(stopBtn);
-        if (!pa)
+        if (!is_pause)
         {
-            new Trainning(Prop_exercise_time, Prop_rest_time, Prop_cycles, Prop_recovery_time, Prop_exercise).play();
+            new Trainning(Prop).play();
         }
-        pa = false;
+        is_pause = false;
     }
     
     function stopp() {
         setDisabled(stopBtn);
         removeDisabled(startBtn);
         startBtn.innerHTML = "Continue";
-        pa = true;
+        is_pause = true;
     }
     
     
@@ -220,12 +217,12 @@ const Timer = ( {Prop_exercise_time,Prop_rest_time,Prop_cycles,Prop_recovery_tim
         startBtn.innerHTML = "Start";
         timer.setAttribute("stroke-dasharray", RESET_DASH_ARRAY);
         timeLabel.innerHTML = "0:00";
-        pa = false;
+        is_pause = false;
       }
 
     return (
         <div >
-        <h1 className='h1time'>{Prop_name}</h1>
+        <h1 className='h1time'>{Prop.name}</h1>
            <div className="base-chrono" id="app"> 
                 <div className="base-timer">  
                   <svg className="base-timer__svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -240,9 +237,6 @@ const Timer = ( {Prop_exercise_time,Prop_rest_time,Prop_cycles,Prop_recovery_tim
                                "></path>
                     </g>
                   </svg>
-
-
-
                   <header>
     <div className="session">
       <div className="breakCtrl">
@@ -252,17 +246,15 @@ const Timer = ( {Prop_exercise_time,Prop_rest_time,Prop_cycles,Prop_recovery_tim
       </div>
       <div className="sessionCtrl">
         <p>Cycles</p>
-        <span className="time" id="cycles">0/0</span>
+        <span className="time" id="cycles">{cycle}</span>
       </div>
     </div>
-  </header>
-              
+  </header>    
                   <span id="base-timer-label" className="base-timer__label">0:00</span>
                   <span id="base-timer-label2" className="base-timer__label2">0:00</span>
                 </div>
               
                 <h2 className='h2time' id="exercices">Exercise 1</h2>
-
               <div className="buttons">
                 <button onClick={e => start()} className="bttn" id="start">
                   Start
