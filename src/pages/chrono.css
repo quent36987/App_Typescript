@@ -1,5 +1,13 @@
 @import url('https://fonts.googleapis.com/css?family=Muli&display=swap');
 
+.h1time {
+	display: block;
+	margin-bottom: 2rem;
+	color: white;
+	text-align: center;
+	font-family: "Pacifico";
+	font-size: 5em;
+  }
 
 .buttonback
 {
@@ -33,6 +41,7 @@ body {
 	margin: 20px;
 	overflow: hidden;
 	width: 700px;
+	
 }
 .course :hover  {   
     background-color: #7175da  ;
@@ -107,8 +116,8 @@ body {
 }
 
 .progress-text {
-	font-size: 10px;
-	opacity: 0.6;
+	font-size: 15px;
+	
 	letter-spacing: 1px;
     margin-left: 4px;
 }

@@ -18,25 +18,41 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
     function loadChronoPage(index: number) {
         window.location.href = "/chrono/" + (index === 0 ? "" : index.toString());
     }
+    function get_exercise_time_total(day : any )
+        {
+            var time_exo_tt = day.exercise_time * day.exercise.length * day.cycles;
+            time_exo_tt += day.rest_time * (day.exercise.length - 1) * day.cycles;
+            time_exo_tt += day.recovery_time * (day.cycles-1);
+            return time_exo_tt;
+        }
+        function  formatTime(time : number) {
+            const minutes = Math.floor(time / 60);
+            let seconds = time % 60;
+            if (seconds < 10) {
+                return `${minutes}:0${seconds}`
+            }
+            return `${minutes}:${seconds}`;
+        }
 
     // return list with all exo or a timer of one exo
     function PageRender() {
         let number = props.match.params.number;
         if (!number || number > bd.days.length) {
-            return <div className="courses-container">
-                    <h1>Liste des exercices</h1>
-                    <div>
+            return <div >
+                    <h1 className='h1time' >Liste des exercices</h1>
+                    <div className="scroll">
                     {bd.days.map((day, key) =>
-                        <div className="course" onClick={() => loadChronoPage(key + 1)}>
+                        <div className="course" onClick={() => loadChronoPage(key + 1)} key={key}>
                             <div className="course-preview">
                                 <h2 className='h22'>{day.name}</h2>
+                                <h6 className='h6'>{day.type}</h6>
                             </div>
 
                             <div className="course-info">
                                 <div className="progress-container">
                                     <FontAwesomeIcon icon={faClock} />
                                     <span className="progress-text">
-                                        15:45
+                                        {formatTime(get_exercise_time_total(day))}
                                     </span>
                                 </div>
                                 <h6>Description</h6>
@@ -61,7 +77,9 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
     }
 
     return (
-        <PageRender />
+        <div>
+            <PageRender />
+        </div>
     );
 }
 

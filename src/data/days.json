@@ -3,6 +3,7 @@
 
     [ {
     "name": "Day 1",
+    "type" : "emom",
     "description": "On commence par un tabata",
     "exercise_time" : 5, 
     "rest_time" : 3,
@@ -12,6 +13,7 @@
     },
     {
         "name": "Day 2",
+        "type" : "tabata",
         "description": "pyramide pour garder la forme",
         "exercise_time" : 4,
         "rest_time" : 4,
@@ -22,6 +24,7 @@
     ,
     {
         "name": "Day 3",
+        "type" : "Pyramide",
         "description": "pyramide pour garder la forme",
         "exercise_time" : 4,
         "rest_time" : 4,
@@ -32,6 +35,39 @@
     ,
     {
         "name": "Echauffement rapide",
+        "type" : "Serie d'exo",
+        "description": "pyramide pour garder la forme",
+        "exercise_time" : 4,
+        "rest_time" : 4,
+        "cycles" : 2,
+        "recovery_time" : 5,
+        "exercise" : ["squat2", "deadlift2", "bench press2"]
+    },
+    {
+        "name": "Day 2",
+        "type" : "tabata",
+        "description": "pyramide pour garder la forme",
+        "exercise_time" : 4,
+        "rest_time" : 4,
+        "cycles" : 5,
+        "recovery_time" : 5,
+        "exercise" : ["squat2", "deadlift2", "bench press2"]
+    }
+    ,
+    {
+        "name": "Day 3",
+        "type" : "Pyramide",
+        "description": "pyramide pour garder la forme",
+        "exercise_time" : 4,
+        "rest_time" : 4,
+        "cycles" : 2,
+        "recovery_time" : 5,
+        "exercise" : ["squat2", "deadlift2", "bench press2"]
+    }
+    ,
+    {
+        "name": "Echauffement rapide",
+        "type" : "Serie d'exo",
         "description": "pyramide pour garder la forme",
         "exercise_time" : 4,
         "rest_time" : 4,
