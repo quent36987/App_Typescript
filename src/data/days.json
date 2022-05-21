@@ -3,77 +3,69 @@
 
     [ {
     "name": "Day 1",
-    "type" : "emom",
-    "description": "On commence par un tabata",
-    "exercise_time" : 5, 
+    "type" : "Tabata",
+    "description": "Let's go !",
+    "exercise_time" : 20, 
     "rest_time" : 3,
-    "cycles" : 2,
-    "recovery_time" : 10,
-    "exercise" : ["squat", "deadlift", "bench press"]
+    "cycles" : 3,
+    "recovery_time" : 120,
+    "exercise" : ["Squat", "Pompe", "Gainage Facial","Squat sautés","Fentes","Dips","Abdos (Sit ups)","Mountain climbers","Montée de genoux"]
     },
     {
         "name": "Day 2",
-        "type" : "tabata",
-        "description": "pyramide pour garder la forme",
-        "exercise_time" : 4,
-        "rest_time" : 4,
-        "cycles" : 5,
-        "recovery_time" : 5,
-        "exercise" : ["squat2", "deadlift2", "bench press2"]
+        "type" : "Tabata",
+        "description": "Toujours facile.",
+        "exercise_time" : 20,
+        "rest_time" : 10,
+        "cycles" : 3,
+        "recovery_time" : 120,
+        "exercise" : ["Montée de genoux", "Saut sur place", "Jumping Jacks","Gainage","Chaise"]
     }
     ,
     {
         "name": "Day 3",
-        "type" : "Pyramide",
-        "description": "pyramide pour garder la forme",
-        "exercise_time" : 4,
-        "rest_time" : 4,
-        "cycles" : 2,
-        "recovery_time" : 5,
-        "exercise" : ["squat2", "deadlift2", "bench press2"]
+        "type" : "Emom",
+        "description": "Plus complexe.",
+        "exercise_time" : 60,
+        "rest_time" : 0,
+        "cycles" : 20,
+        "recovery_time" : 1,
+        "exercise" : ["3 Burpees + 6 Fentes"]
     }
     ,
     {
-        "name": "Echauffement rapide",
-        "type" : "Serie d'exo",
-        "description": "pyramide pour garder la forme",
-        "exercise_time" : 4,
-        "rest_time" : 4,
-        "cycles" : 2,
-        "recovery_time" : 5,
-        "exercise" : ["squat2", "deadlift2", "bench press2"]
+        "name": "Day 4",
+        "type" : "Pyramide",
+        "description": "(vraiment) plus complexe.",
+        "exercise_time" : 0,
+        "rest_time" : 45,
+        "cycles" : 3,
+        "recovery_time" : 60,
+        "exercise" : ["Pompes", "Sit Up", "Superman"],
+        "pyramide" : ["30","20","10"]
     },
     {
-        "name": "Day 2",
-        "type" : "tabata",
-        "description": "pyramide pour garder la forme",
-        "exercise_time" : 4,
-        "rest_time" : 4,
+        "name": "Day 5",
+        "type" : "Serie Exo",
+        "description": "On travaille un peu les abdos",
+        "exercise_time" : 0,
+        "rest_time" : 0,
         "cycles" : 5,
-        "recovery_time" : 5,
-        "exercise" : ["squat2", "deadlift2", "bench press2"]
-    }
-    ,
-    {
-        "name": "Day 3",
-        "type" : "Pyramide",
-        "description": "pyramide pour garder la forme",
-        "exercise_time" : 4,
-        "rest_time" : 4,
-        "cycles" : 2,
-        "recovery_time" : 5,
-        "exercise" : ["squat2", "deadlift2", "bench press2"]
+        "recovery_time" : 60,
+        "exercise" : ["10 Russian Twists", "10 Squats", "10 Mountain Climbers"],
+        "exercise_info" : [-1,-1,-1]
     }
     ,
     {
         "name": "Echauffement rapide",
-        "type" : "Serie d'exo",
+        "type" : "Serie Exo",
         "description": "pyramide pour garder la forme",
         "exercise_time" : 4,
         "rest_time" : 4,
         "cycles" : 2,
         "recovery_time" : 5,
-        "exercise" : ["squat2", "deadlift2", "bench press2"]
+        "exercise" : ["squat2", " 5 deadlift2", "bench press2"],
+        "exercise_info" : [2,-1,20]
     }
     ]
 

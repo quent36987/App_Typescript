@@ -7,6 +7,9 @@ export type TimerProps = {
     recovery_time : number,
     exercise : string[],
     name : string,
+    type : string,
+    pyramide? : string[],
+    exercise_info? : number[],
   }
 
   enum TYPE_TIMER {
@@ -19,6 +22,7 @@ export type TimerProps = {
     timer : number,
     type : TYPE_TIMER,
     name? : string,
+    color : any,
 }
 
 
@@ -39,6 +43,7 @@ const Timer = ( Prop : TimerProps) => {
      let  recovery_time =Prop.recovery_time;
      let  exercise = Prop.exercise;
 
+
      let   _cycle  = 0;
      let   _set  = 0;
 
@@ -47,7 +52,9 @@ const Timer = ( Prop : TimerProps) => {
     let timeLabel = document.getElementById("base-timer-label") as HTMLElement;
     let setslabel = document.getElementById("sets") as HTMLElement;
     let cyclelabel = document.getElementById("cycles") as HTMLElement;
-    let exerciceslabel = document.getElementById("exercices") as HTMLElement;
+    let exerciceslabel1 = document.getElementById("exercices1") as HTMLElement;
+    let exerciceslabel2 = document.getElementById("exercices2") as HTMLElement;
+    let exerciceslabel3 = document.getElementById("exercices3") as HTMLElement;
 
     //All buttons
     let startBtn = document.getElementById("start")as HTMLButtonElement;
@@ -62,6 +69,52 @@ const Timer = ( Prop : TimerProps) => {
         button.removeAttribute("disabled");
     }
 
+    function SetExoLabel(time : TypeTimer) {
+      if (time == null)
+      {
+        exerciceslabel1.innerHTML = "Ready !";
+        exerciceslabel2.innerHTML = "Ready !";
+        exerciceslabel3.innerHTML = "Ready !";
+        return;
+      }
+
+        if (time.type === TYPE_TIMER.Exo) {
+          exerciceslabel2.innerHTML = exercise[_set];
+          if (_set < exercise.length - 1) {
+            exerciceslabel3.innerHTML = " >  Rest";
+          }
+          else
+          {
+            if (_cycle < cycles - 1) {
+              exerciceslabel3.innerHTML = " > Recovery";
+            }
+            else{
+              exerciceslabel3.innerHTML = " > Fini !";
+            }
+          }
+          if (_set > 0) {
+            exerciceslabel1.innerHTML = "Rest > ";
+          }
+          else if (_cycle > 0) {
+            exerciceslabel1.innerHTML = "Recovery > " ;
+          }
+          else{
+            exerciceslabel1.innerHTML = "Ready > ";
+          }
+
+        }else if (time.type === TYPE_TIMER.Rest) {
+          exerciceslabel1.innerHTML =  exercise[_set-1] + " > " ;
+          exerciceslabel2.innerHTML = "Rest";
+          exerciceslabel3.innerHTML = " > " + exercise[_set];
+        }else{
+          exerciceslabel1.innerHTML = exercise[exercise.length -1] + " > " ;
+          exerciceslabel2.innerHTML = "Recovery";
+          exerciceslabel3.innerHTML = " > " + exercise[0];
+        }
+        
+        
+    }
+
     
         function  setCircleDasharray(timeLeft : number, timetotal : number) {
             const rawTimeFraction = timeLeft / timetotal;
@@ -70,6 +123,9 @@ const Timer = ( Prop : TimerProps) => {
             TimeFraction * FULL_DASH_ARRAY
           ).toFixed(0)} 283`;
           timer?.setAttribute("stroke-dasharray", circleDasharray);
+ 
+        
+
         }
     
         function  formatTime(time : number) {
@@ -84,52 +140,55 @@ const Timer = ( Prop : TimerProps) => {
     
        function timerOn()
         {
-            console.log("timerOn");
+
             if (timers.length > 0)
             {
-                const timer = timers.pop();
+                const time = timers.pop();
                 let i = -1;
-                if(timer?.name && timeLabel){
-                    exerciceslabel.innerHTML = timer.name;
-                    i = timer.timer;
+                if(time?.name == null || time?.timer == null || timeLabel == null){
+                    return;
                 }
-                else{
-                    exerciceslabel.innerHTML = "";
-                }
-        
-                timerInterval = window.setInterval(() => { 
-                    if(!is_pause)
-                    {
-                        
-                        console.log("pause :" +  is_pause);
-                        if (timer?.timer  && i !== -1 && i > 0)
-                        {
-                            setCircleDasharray(i,timer.timer);
-                            timeLabel.innerHTML = formatTime(i);
-                            i--;
-                        }
-                        else if(timer  && i !== -1)
-                        {
-                            
-                            timeLabel.innerHTML = formatTime(i);
-                            if(timer.type === TYPE_TIMER.Exo)
+                SetExoLabel(time);
+               
+                  i = time.timer;
+                   timer.style.color = time.color;
+                   cyclelabel.innerHTML =  _cycle.toString()+"/" + cycles.toString();
+                   setslabel.innerHTML = _set.toString() + "/" + exercise.length.toString();
+                   if(time.type === TYPE_TIMER.Exo)
                             {   
                                 _set+=1;
-                               cyclelabel.innerHTML =  _cycle.toString()+"/" + cycles.toString();
-                               setslabel.innerHTML = _set.toString() + "/" + exercise.length.toString();  
+                                console.log("ici");
+                              
                             }
-                            else if(timer.type === TYPE_TIMER.Recovery)
+                            else if(time.type === TYPE_TIMER.Recovery)
                             {
                                 _cycle +=1;
-                                _set=1;
-                                cyclelabel.innerHTML =  _cycle.toString()+"/" + cycles.toString();
-                                setslabel.innerHTML = _set.toString() + "/" + exercise.length.toString();
+                                _set=0;  
                             }
+                   timerInterval = window.setInterval(() => { 
+                    if(!is_pause)
+                    {
+                        timeLabel.innerHTML = formatTime(i)
+                        if ( i > 0)
+                        {
+                            setCircleDasharray(i,time.timer);
+                            i--;
+                        }
+                        else if (i === 0)
+                        {
                             window.clearInterval(timerInterval);
                             timerOn();
-                        }
+                         }
+                         else{
+                            
+                            window.clearInterval(timerInterval);
+                         }
+
                     }
                 }, 1000);
+            }
+            else{
+              reset();
             }
         }
         // play the tabata (timer)
@@ -138,21 +197,24 @@ const Timer = ( Prop : TimerProps) => {
             for (let cycle = 0; cycle < cycles; cycle++) {
                 for (let exo = 0; exo < exercise.length; exo++) {
                     // play the exercise
-                    timers.unshift({timer : exercise_time, type : TYPE_TIMER.Exo, name : exercise[exo]});
+                    
+                    timers.unshift({timer : Prop.type === "Serie Exo" ? Prop.exercise_info[exo] : exercise_time, type : TYPE_TIMER.Exo, name : exercise[exo], color : "red"});
                     // play the rest
                     if (exo < exercise.length - 1)
                     { 
-                        timers.unshift({timer : rest_time, type : TYPE_TIMER.Rest, name : "Rest"});
+                        timers.unshift({timer : rest_time, type : TYPE_TIMER.Rest, name : "Rest", color : "green"});
                     }
                 }
                 // play the recovery
                 if (cycle < cycles - 1)
                 {
-                    timers.unshift({timer : recovery_time, type : TYPE_TIMER.Recovery, name : "Recovery"});
+                    timers.unshift({timer : recovery_time, type : TYPE_TIMER.Recovery, name : "Recovery", color : "blue"});
                 }
             }
             setslabel.innerHTML = "0/" + exercise.length.toString();
             cyclelabel.innerHTML = "0/" + cycles.toString();
+          
+
             timerOn();
         }
     
@@ -166,7 +228,9 @@ const Timer = ( Prop : TimerProps) => {
      timeLabel = document.getElementById("base-timer-label") as HTMLElement;
      setslabel = document.getElementById("sets") as HTMLElement;
      cyclelabel = document.getElementById("cycles") as HTMLElement;
-     exerciceslabel = document.getElementById("exercices") as HTMLElement;
+      exerciceslabel1 = document.getElementById("exercices1") as HTMLElement;
+     exerciceslabel2 = document.getElementById("exercices2") as HTMLElement;
+     exerciceslabel3 = document.getElementById("exercices3") as HTMLElement;
 
     //All buttons
      startBtn = document.getElementById("start")as HTMLButtonElement;
@@ -211,6 +275,20 @@ const Timer = ( Prop : TimerProps) => {
         cyclelabel.innerHTML =  _cycle.toString()+"/" + cycles.toString();
         setslabel.innerHTML = _set.toString() + "/" + exercise.length.toString();
 
+        SetExoLabel(null);
+        setCircleDasharray(0,0);
+        timer.style.color = "#2A265F";
+      }
+
+      function suivant()
+      {
+        window.clearInterval(timerInterval);
+        if (_cycle === cycles)
+        {
+          reset();
+          return ;
+        }
+        timerOn();
       }
 
 
@@ -247,8 +325,13 @@ const Timer = ( Prop : TimerProps) => {
                   <span id="base-timer-label" className="base-timer__label">0:00</span>
                   <span id="base-timer-label2" className="base-timer__label2">0:00</span>
                 </div>
-              
-                <h2 className='h2time' id="exercices">Ready !</h2>
+               
+              <div style={{"display":"flex", "alignItems":"center"}}>
+                <h2 className='h2time2' id="exercices1">  Ready !</h2>
+                <h2 className='h2time' id="exercices2">Ready !</h2>
+                <h2 className='h2time2' id="exercices3">  Ready !</h2>
+              </div>
+            
               <div className="buttons">
                 <button onClick={e => start()} className="bttn" id="start">
                   Start
@@ -259,8 +342,14 @@ const Timer = ( Prop : TimerProps) => {
                 <button onClick={e => reset()} className="bttn" id="reset">
                   Reset
                 </button>
+                <button  className='bttn' 
+                  id='suivant' onClick={e => suivant()}>
+                  Suivant
+                </button>
               </div>
+               
               </div>
+              
         </div>
     );
 }

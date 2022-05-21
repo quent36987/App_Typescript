@@ -92,7 +92,6 @@
 	color: #fff;
 	font-size: 16px;
 	padding: 12px 25px;
-	
 	bottom: 30px;
 	right: 30px;
 	letter-spacing: 1px;
@@ -112,15 +111,17 @@
   margin-bottom: 1rem;
 }
 
-.buttons button:hover {
+.buttons .bttn:hover {
   background-color: #fdfdfd;
   color: #2A265F;
 }
 
-.buttons button:disabled {
+.buttons .bttn:disabled {
   cursor: not-allowed;
+  background-color: #fdfdfd;
+  color: #333333;
 }
-.buttons button:disabled:hover{
+.buttons .bttn:disabled:hover{
   background-color:beige;
 }
 
@@ -147,11 +148,20 @@ html, body, main {
 
 .h2time{
 
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   color: white;
   text-align: center;
   font-family:  Open Sans, Arial;
   font-size: 2em;
+}
+.h2time2{
+  margin-left: 1rem;
+  margin-right: 1rem;
+  margin-top: 1rem;
+  color: white;
+  text-align: center;
+  font-family:  Open Sans, Arial;
+  font-size: 1em;
 }
 
 header {

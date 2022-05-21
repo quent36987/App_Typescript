@@ -38,9 +38,9 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
     function PageRender() {
         let number = props.match.params.number;
         if (!number || number > bd.days.length) {
-            return <div >
+            return <div className="scroll">
                     <h1 className='h1time' >Liste des exercices</h1>
-                    <div className="scroll">
+                    <div className="courselist">
                     {bd.days.map((day, key) =>
                         <div className="course" onClick={() => loadChronoPage(key + 1)} key={key}>
                             <div className="course-preview">
@@ -71,7 +71,10 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                                 exercise={bd.days[number - 1].exercise}
                                 cycles={bd.days[number - 1].cycles}
                                 recovery_time={bd.days[number - 1].recovery_time}
-                                name={bd.days[number - 1].name} />
+                                name={bd.days[number - 1].name}
+                                type={bd.days[number -1 ].type}
+                                exercise_info={bd.days[number -1].exercise_info} 
+                                pyramide={bd.days[number -1].pyramide} />
                    </div>
         }
     }
