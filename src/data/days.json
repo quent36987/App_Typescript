@@ -37,7 +37,7 @@
         "name": "Day 4",
         "type" : "Pyramide",
         "description": "(vraiment) plus complexe.",
-        "exercise_time" : 0,
+        "exercise_time" : 30,
         "rest_time" : 45,
         "cycles" : 3,
         "recovery_time" : 60,
@@ -48,7 +48,7 @@
         "name": "Day 5",
         "type" : "Serie Exo",
         "description": "On travaille un peu les abdos",
-        "exercise_time" : 0,
+        "exercise_time" : 30,
         "rest_time" : 0,
         "cycles" : 5,
         "recovery_time" : 60,
@@ -57,15 +57,15 @@
     }
     ,
     {
-        "name": "Echauffement rapide",
+        "name": "Day 6",
         "type" : "Serie Exo",
-        "description": "pyramide pour garder la forme",
-        "exercise_time" : 4,
-        "rest_time" : 4,
-        "cycles" : 2,
-        "recovery_time" : 5,
-        "exercise" : ["squat2", " 5 deadlift2", "bench press2"],
-        "exercise_info" : [2,-1,20]
+        "description": "Aïe, j'ai pas envie de faire celle là...",
+        "exercise_time" : 30,
+        "rest_time" : 0,
+        "cycles" : 5,
+        "recovery_time" : 60,
+        "exercise" : ["Gainage", "5 à 10 Burpees", "Up and Down"],
+        "exercise_info" : [30,-1,30]
     }
     ]
 

@@ -2,6 +2,7 @@ import IRoute from '../interfaces/route';
 import AboutPage from '../pages/about';
 import HomePage from '../pages/home';
 import ChronoPage from '../pages/chrono';
+import ChronoForm from '../pages/creation_chrono';
 
 const routes: IRoute[] = [
     {
@@ -32,6 +33,12 @@ const routes: IRoute[] = [
         path: '/chrono/:number',
         name: 'Chrono Page',
         component: ChronoPage,
+        exact: true
+    },
+    {
+        path: '/chronoform',
+        name: 'Chrono Form',
+        component: ChronoForm,
         exact: true
     },
 ]
