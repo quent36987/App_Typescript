@@ -1,8 +1,12 @@
 import * as React from "react";
 import RLDD from "react-list-drag-and-drop/lib/RLDD";
 import "./listexo.css";
+import fs from 'fs'
 
 const fruits = require("./fruits.json");
+
+const path = require('path');
+
 
 interface Item {
   id: number;
@@ -15,12 +19,15 @@ interface State {
   items: Item[];
   titre: string;
   temps : number | null;
+  cycle : number;
+  recovery : number;
 }
 
 export default class VerticalExample extends React.PureComponent<{}, State> {
   constructor(props: {}) {
     super(props);
-    this.state = { items: fruits.fruits, titre: "" ,temps :null };
+    this.state = { items: [], titre: "" ,
+          temps :null,cycle:0,recovery:0};
    
   }
 
@@ -67,7 +74,7 @@ export default class VerticalExample extends React.PureComponent<{}, State> {
   private addItem = () => {
     const items = this.state.items;
     items.push({
-      id: items.sort((a, b) => a.id - b.id)[items.length - 1].id + 1,
+      id: items.length === 0 ? 0 : items.sort((a, b) => a.id - b.id)[items.length - 1].id + 1,
       title: this.state.titre,
       body: this.state.temps ? this.state.temps : 0,
       icon: ""
@@ -82,7 +89,19 @@ export default class VerticalExample extends React.PureComponent<{}, State> {
 
   private submit = () =>
   {
-    console.log(this.state.items);
+    console.log(JSON.stringify(this.state.items));
+
+    //save items on a file.json
+    //var fs = require('fs');
+    var fs = require('browserify-fs');
+    var file = path.join('', 'exo.json');
+
+    /*fs.writeFile(file, JSON.stringify(this.state.items), (err) => {
+      if (err) throw err;
+      console.log('The file has been saved!' +file);
+    }
+    );*/
+
   };
 
   private itemRenderer = (item: Item, index: number): JSX.Element => {

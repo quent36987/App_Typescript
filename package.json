@@ -15,6 +15,7 @@
     "@types/react": "^16.14.2",
     "@types/react-dom": "^16.9.10",
     "bootstrap-icons": "^1.8.2",
+    "browserify-fs": "^1.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-list-drag-and-drop": "^0.9.2",
