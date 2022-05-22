@@ -1,17 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import IPage from '../interfaces/page';
 import logging from '../config/logging';
 import { Route, RouteComponentProps, withRouter } from 'react-router-dom';
 import Timer from './../componants/timer';
-import bd from './../data/days.json';
+import {db} from "../firebase";
 import "./chrono.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock } from "@fortawesome/free-solid-svg-icons";
+import { onSnapshot, collection, query, orderBy } from 'firebase/firestore';
+
 
 const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = props => {
+    const [list, setList] = useState([]);
 
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
+        const collectionRef = collection(db, "exercices");
+       const q = query(collectionRef, orderBy("name", "desc"));
+        const unsub = onSnapshot(q, (snapshot) => {
+            setList(snapshot.docs.map((doc) => ({ ...doc.data() , id: doc.id })));
+        console.log(list);
+        });
     }, [props])
 
     // load the timer (this page + '/' + timer)
@@ -35,13 +44,15 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
 
     // return list with all exo or a timer of one exo
     function PageRender() {
+
+       
         let number = props.match.params.number;
-        if (!number || number > bd.days.length) {
+        if (!number || number > list.length) {
             return <div className="scroll">
                  <button className='buttonback' onClick={() => {window.location.href = "/"}}>BACK</button>
                 <h1 className='h1time' >Liste des exercices</h1>
                 <div className="courselist">
-                    {bd.days.map((day, key) =>
+                    {list.map((day, key) =>
                         <div className="course" onClick={() => loadChronoPage(key + 1)} key={key}>
                             <div className="course-preview">
                                 <h2 className='h22'>{day.name}</h2>
@@ -66,18 +77,19 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
         else {
             return <div>
                 <button className='buttonback' onClick={() => loadChronoPage(0)}>BACK</button>
-                <Timer exercise_time={bd.days[number - 1].exercise_time}
-                    rest_time={bd.days[number - 1].rest_time}
-                    exercise={bd.days[number - 1].exercise}
-                    cycles={bd.days[number - 1].cycles}
-                    recovery_time={bd.days[number - 1].recovery_time}
-                    name={bd.days[number - 1].name}
-                    type={bd.days[number - 1].type}
-                    exercise_info={bd.days[number - 1].exercise_info}
-                    pyramide={bd.days[number - 1].pyramide} />
+                <Timer exercise_time={list[number - 1].exercise_time}
+                    rest_time={list[number - 1].rest_time}
+                    exercise={list[number - 1].exercise}
+                    cycles={list[number - 1].cycles}
+                    recovery_time={list[number - 1].recovery_time}
+                    name={list[number - 1].name}
+                    type={list[number - 1].type}
+                    exercise_info={list[number - 1].exercise_info}
+                    pyramide={list[number - 1].pyramide} />
             </div>
         }
-    }
+
+}
 
     return (
         <div>

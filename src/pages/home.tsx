@@ -3,6 +3,7 @@ import IPage from '../interfaces/page';
 import logging from '../config/logging';
 import { Link } from 'react-router-dom';
 
+
 const HomePage: React.FunctionComponent<IPage> = props => {
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
