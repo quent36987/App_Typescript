@@ -2,7 +2,7 @@ import IRoute from '../interfaces/route';
 import AboutPage from '../pages/about';
 import HomePage from '../pages/home';
 import ChronoPage from '../pages/chrono';
-import ChronoForm from '../pages/creation_chrono';
+import ChronoForm from '../pages/chronoform';
 
 const routes: IRoute[] = [
     {
