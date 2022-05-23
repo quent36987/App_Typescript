@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import IPage from '../interfaces/page';
 import logging from '../config/logging';
-import { Route, RouteComponentProps, withRouter } from 'react-router-dom';
+import {  RouteComponentProps, withRouter } from 'react-router-dom';
 import Timer from './../componants/timer';
 import {db} from "../firebase";
 import "./chrono.css";
@@ -17,9 +17,8 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
         logging.info(`Loading ${props.name}`);
         const collectionRef = collection(db, "exercices");
        const q = query(collectionRef, orderBy("name", "desc"));
-        const unsub = onSnapshot(q, (snapshot) => {
+        onSnapshot(q, (snapshot) => {
             setList(snapshot.docs.map((doc) => ({ ...doc.data() , id: doc.id })));
-        console.log(list);
         });
     }, [props])
 

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Route, Switch, RouteComponentProps } from 'react-router-dom';
+import Alert from './componants/Alert';
 import logging from './config/logging';
 import routes from './config/routes';
 
@@ -14,13 +15,13 @@ const Application: React.FunctionComponent<{}> = props => {
                 <Switch>
                     {routes.map((route, index) => {
                         return (
-                            <Route 
+                            <Route
                                 key={index}
                                 path={route.path}
                                 exact={route.exact}
                                 render={(props: RouteComponentProps<any>) => (
                                     <route.component
-                                        name={route.name} 
+                                        name={route.name}
                                         {...props}
                                         {...route.props}
                                     />
@@ -29,6 +30,7 @@ const Application: React.FunctionComponent<{}> = props => {
                         );
                     })}
                 </Switch>
+                <Alert />
             </BrowserRouter>
         </div>
     );

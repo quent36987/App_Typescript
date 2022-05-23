@@ -8,8 +8,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
     
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
-        console.log(props);
-    }, [props.name])
+    }, [props])
 
     return (
         <div>

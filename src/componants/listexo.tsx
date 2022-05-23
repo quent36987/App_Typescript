@@ -1,12 +1,8 @@
 import * as React from "react";
 import RLDD from "react-list-drag-and-drop/lib/RLDD";
 import "./listexo.css";
-import fs from 'fs'
 import {db} from "../firebase";
 import { collection, addDoc  } from "firebase/firestore";
-const fruits = require("./fruits.json");
-
-const path = require('path');
 
 
 interface Item {
@@ -116,14 +112,7 @@ export default class VerticalExample extends React.PureComponent<{}, State> {
 
 
   addPost = async () => {
-    const date = Date.now();
     const collectionRef = collection(db, "post");
-
-   /* var exo = []; 
-    this.state.items.forEach(element => exo.push(element.title));
-    console.log(it);*/
-
-
     const payload2 = { name : this.state.name ,
                        date:(Date.now()), 
                        cycle:this.state.cycle,
