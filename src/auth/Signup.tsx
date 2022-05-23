@@ -1,8 +1,9 @@
 
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { AppState } from "../Context";
+import { doc, setDoc } from "firebase/firestore";
 
 const Signup = ({ handleClose }) => {
   const [email, setEmail] = useState("");
@@ -27,13 +28,26 @@ const Signup = ({ handleClose }) => {
         password
       );
       console.log("Sign Up Successful. Welcome" + result.user.email);
-      setAlert({
-        open: true,
-        message: `Sign Up Successful. Welcome ${result.user.email}`,
-        type: "success",
-      });
+      try {
+        await  setDoc(doc(db, "Users", result.user.uid), {
+          name: "",
+        });
+        setAlert({
+          open: true,
+          message: `Sign Up Successful. Welcome ${result.user.email}`,
+          type: "success",
+        });
+      }
+      catch (error)
+      {
+        console.log(error);
+        setAlert({
+          open: true,
+          type: "error",
+          message: "Error on creating user"});
+      }
 
-      handleClose();
+      
     } catch (error) {
       console.log("error" + error.message);
       setAlert({

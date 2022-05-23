@@ -1,3 +1,6 @@
+import { addDoc, arrayUnion, collection, doc, setDoc, updateDoc } from "firebase/firestore";
+import { AppState } from "../Context";
+import { db } from "../firebase";
 import "./timer.css";
 
 export type TimerProps = {
@@ -10,6 +13,7 @@ export type TimerProps = {
   type: string,
   pyramide?: string[],
   exercise_info?: number[],
+  exercise_id: string,
 }
 
 enum TYPE_TIMER {
@@ -27,7 +31,12 @@ type TypeTimer = {
 
 
 
+
+
 const Timer = (Prop: TimerProps) => {
+
+  const { user, setAlert } = AppState();
+
   //const
   const FULL_DASH_ARRAY = 283;
   const RESET_DASH_ARRAY = `-57 ${FULL_DASH_ARRAY}`;
@@ -68,6 +77,8 @@ const Timer = (Prop: TimerProps) => {
   function removeDisabled(button: HTMLButtonElement) {
     button.removeAttribute("disabled");
   }
+
+  
 
   function SetExoLabel(time: TypeTimer) {
     if (time == null) {
@@ -272,6 +283,25 @@ const Timer = (Prop: TimerProps) => {
     timerOn();
   }
 
+  async function finish()  {
+    if (user)
+    {
+      const UserDocRef = doc(db, 'Users', user.uid);
+      const payload = { exo_log : arrayUnion({date : Date.now() , exo : Prop.exercise_id } ) };          
+      try {
+        await updateDoc(UserDocRef, payload);
+      }
+      catch (error)
+      {
+        console.log(error);
+      }
+    }
+    else {
+
+    }
+    reset();
+    window.location.href = "/";
+  };
 
   return (
     <div >
@@ -326,6 +356,10 @@ const Timer = (Prop: TimerProps) => {
           <button className='bttn'
             id='suivant' onClick={e => suivant()}>
             Suivant
+          </button>
+          <button className='bttn'
+             id='finish' onClick={e => finish()}>
+            Finish
           </button>
         </div>
 

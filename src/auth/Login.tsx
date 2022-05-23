@@ -13,7 +13,7 @@ const Login = ({ handleClose }) => {
   const handleSubmit = async () => {
     if (!email || !password) {
       console.log("email or password is empty");
-    setAlert({
+      setAlert({
         open: true,
         message: "Please fill all the Fields",
         type: "error",
@@ -33,7 +33,7 @@ const Login = ({ handleClose }) => {
       handleClose();
     } catch (error) {
       console.log(error.message);
-    setAlert({
+      setAlert({
         open: true,
         message: error.message,
         type: "error",
@@ -56,13 +56,13 @@ const Login = ({ handleClose }) => {
         onChange={(e) => setPassword(e.target.value)}
       />
       <button
-      
+
         onClick={handleSubmit}
         style={{ backgroundColor: "#EEBC1D" }}
       >
         Login
       </button>
-      </div>
+    </div>
   );
 };
 

@@ -12,13 +12,15 @@ import { onSnapshot, collection, query, orderBy } from 'firebase/firestore';
 
 const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = props => {
     const [list, setList] = useState([]);
-
+    
+    
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
         const collectionRef = collection(db, "exercices");
        const q = query(collectionRef, orderBy("name", "desc"));
         onSnapshot(q, (snapshot) => {
             setList(snapshot.docs.map((doc) => ({ ...doc.data() , id: doc.id })));
+            
         });
     }, [props])
 
@@ -44,7 +46,6 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
     // return list with all exo or a timer of one exo
     function PageRender() {
 
-       
         let number = props.match.params.number;
         if (!number || number > list.length) {
             return <div className="scroll">
@@ -84,7 +85,8 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                     name={list[number - 1].name}
                     type={list[number - 1].type}
                     exercise_info={list[number - 1].exercise_info}
-                    pyramide={list[number - 1].pyramide} />
+                    pyramide={list[number - 1].pyramide} 
+                    exercise_id={list[number -1].id}/>
             </div>
         }
 
