@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import IPage from '../interfaces/page';
 import logging from '../config/logging';
 import {  RouteComponentProps, withRouter } from 'react-router-dom';
-import Timer from './../componants/timer';
+import Timer from '../componants/timer';
 import {db} from "../firebase";
 import "./chrono.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,16 +11,13 @@ import { onSnapshot, collection, query, orderBy, doc, getDoc } from 'firebase/fi
 import { AppState } from '../Context';
 
 
+    
 const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = props => {
     const [list, setList] = useState([]);
     const [list_user, setListUser] = useState([]);
     
     const { user } = AppState();
     
-
-   
-
-
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
         const collectionRef = collection(db, "exercices");
@@ -30,8 +27,12 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
         });
     }, [props])
 
+
     
- useEffect(() => {
+
+
+    
+    useEffect(() => {
     async function etst() {
         if (user) {
             const docRef = doc(db, "Users", user.uid);

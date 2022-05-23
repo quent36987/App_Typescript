@@ -3,6 +3,7 @@ import Signup from "./Signup";
 import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
 import { AppState } from "../Context";
+import { Link } from "react-router-dom";
 
 
 export default function AuthModal() {
@@ -36,10 +37,11 @@ export default function AuthModal() {
                         </div> :
                         <div>
                             <h1>hello {user.email} </h1>
+                            
                             <button onClick={logOut}>Logout</button>
                         </div>
                     } 
-                
+                <Link to="/profile">Profile</Link>
         </div> 
 
     )

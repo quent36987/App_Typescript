@@ -17,7 +17,6 @@ const HomePage: React.FunctionComponent<IPage> = props => {
             <div>
             <Link to="/chronoform"> Creation Exo</Link>
             </div>
-
             <AuthModal/>
         </div>
     )
