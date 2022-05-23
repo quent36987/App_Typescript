@@ -1,18 +1,18 @@
-import { addDoc, arrayUnion, collection, doc, setDoc, updateDoc } from "firebase/firestore";
+import {  arrayUnion, doc,  updateDoc } from "firebase/firestore";
 import { AppState } from "../Context";
 import { db } from "../firebase";
 import "./timer.css";
 
 export type TimerProps = {
-  exercise_time: number,
+  exercises_time: number,
   rest_time: number,
   cycles: number,
   recovery_time: number,
-  exercise: string[],
+  exercises: string[],
   name: string,
   type: string,
   pyramide?: string[],
-  exercise_info?: number[],
+  exercises_info?: number[],
   exercise_id: string,
 }
 
@@ -34,8 +34,7 @@ type TypeTimer = {
 
 
 const Timer = (Prop: TimerProps) => {
-
-  const { user, setAlert } = AppState();
+  const { user } = AppState();
 
   //const
   const FULL_DASH_ARRAY = 283;
@@ -46,11 +45,13 @@ const Timer = (Prop: TimerProps) => {
   let is_pause = false;
 
   let timers: Array<TypeTimer> = [];
-  let exercise_time = Prop.exercise_time;
+  let exercise_time = Prop.exercises_time;
   let rest_time = Prop.rest_time;
   let cycles = Prop.cycles;
   let recovery_time = Prop.recovery_time;
-  let exercise = Prop.exercise;
+  let exercise = Prop.exercises;
+
+
 
 
   let _cycle = 0;
@@ -196,7 +197,7 @@ const Timer = (Prop: TimerProps) => {
       for (let exo = 0; exo < exercise.length; exo++) {
         // play the exercise
 
-        timers.unshift({ timer: Prop.type === "Serie Exo" ? Prop.exercise_info[exo] : exercise_time, type: TYPE_TIMER.Exo, name: exercise[exo], color: "red" });
+        timers.unshift({ timer: Prop.type === "Serie Exo" ? Prop.exercises_info[exo] : exercise_time, type: TYPE_TIMER.Exo, name: exercise[exo], color: "red" });
         // play the rest
         if (exo < exercise.length - 1) {
           timers.unshift({ timer: rest_time, type: TYPE_TIMER.Rest, name: "Rest", color: "green" });
@@ -258,11 +259,11 @@ const Timer = (Prop: TimerProps) => {
     is_pause = false;
 
     timers = [];
-    exercise_time = Prop.exercise_time;
+    exercise_time = Prop.exercises_time;
     rest_time = Prop.rest_time;
     cycles = Prop.cycles;
     recovery_time = Prop.recovery_time;
-    exercise = Prop.exercise;
+    exercise = Prop.exercises;
 
     _cycle = 0;
     _set = 0;
@@ -300,7 +301,7 @@ const Timer = (Prop: TimerProps) => {
 
     }
     reset();
-    window.location.href = "/";
+    window.location.href = "/chrono";
   };
 
   return (

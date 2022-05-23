@@ -7,30 +7,55 @@ import {db} from "../firebase";
 import "./chrono.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock } from "@fortawesome/free-solid-svg-icons";
-import { onSnapshot, collection, query, orderBy } from 'firebase/firestore';
+import { onSnapshot, collection, query, orderBy, doc, getDoc } from 'firebase/firestore';
+import { AppState } from '../Context';
 
 
 const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = props => {
     const [list, setList] = useState([]);
+    const [list_user, setListUser] = useState([]);
     
+    const { user } = AppState();
     
+
+   
+
+
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
         const collectionRef = collection(db, "exercices");
        const q = query(collectionRef, orderBy("name", "desc"));
         onSnapshot(q, (snapshot) => {
             setList(snapshot.docs.map((doc) => ({ ...doc.data() , id: doc.id })));
-            
         });
     }, [props])
+
+    
+ useEffect(() => {
+    async function etst() {
+        if (user) {
+            const docRef = doc(db, "Users", user.uid);
+            try {
+                const doc = await getDoc(docRef);
+                setListUser(doc.data().exo_log);
+            } catch (e) {
+
+                console.log("Error getting cached document:", e);
+            }
+        }
+    };
+    etst();
+}, [user]);
+
+
 
     // load the timer (this page + '/' + timer)
     function loadChronoPage(index: number) {
         window.location.href = "/chrono/" + (index === 0 ? "" : index.toString());
     }
     function get_exercise_time_total(day: any) {
-        var time_exo_tt = day.exercise_time * day.exercise.length * day.cycles;
-        time_exo_tt += day.rest_time * (day.exercise.length - 1) * day.cycles;
+        var time_exo_tt = day.exercises_time * day.exercises.length * day.cycles;
+        time_exo_tt += day.rest_time * (day.exercises.length - 1) * day.cycles;
         time_exo_tt += day.recovery_time * (day.cycles - 1);
         return time_exo_tt;
     }
@@ -67,6 +92,9 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                                     </span>
                                 </div>
                                 <h6>Description</h6>
+                                {list_user.find(e => e.exo === day.id) !== undefined ?
+                                 <h6 className='h6'>Vous avez déjà effectué cet exercice</h6> :
+                                 <h6 className='h6'>Vous n'avez pas encore effectué cet exercice</h6>}
                                 <h2 className='desc'>{day.description}</h2>
                             </div>
                         </div>
@@ -77,14 +105,14 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
         else {
             return <div>
                 <button className='buttonback' onClick={() => loadChronoPage(0)}>BACK</button>
-                <Timer exercise_time={list[number - 1].exercise_time}
+                <Timer exercises_time={list[number - 1].exercises_time}
                     rest_time={list[number - 1].rest_time}
-                    exercise={list[number - 1].exercise}
+                    exercises={list[number - 1].exercises}
                     cycles={list[number - 1].cycles}
                     recovery_time={list[number - 1].recovery_time}
                     name={list[number - 1].name}
                     type={list[number - 1].type}
-                    exercise_info={list[number - 1].exercise_info}
+                    exercises_info={list[number - 1].exercises_info}
                     pyramide={list[number - 1].pyramide} 
                     exercise_id={list[number -1].id}/>
             </div>
