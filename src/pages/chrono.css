@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Muli&display=swap');
-
+/*
 .h1time {
 	display: block;
 	margin-bottom: 2rem;
@@ -16,9 +16,6 @@
   left: 0;
 }
 
-* {
-	box-sizing: border-box;
-}
 .scroll
 {
 	overflow-y: scroll;
@@ -146,4 +143,4 @@ body {
 	right: 30px;
 	letter-spacing: 1px;
 }
-
+*/

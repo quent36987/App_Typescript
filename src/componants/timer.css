@@ -1,4 +1,4 @@
-
+/*
 
 .timerheader{
   display: flex;
@@ -23,7 +23,7 @@
   display: grid;
   place-items: center;
 }
-/* scaleX(1) = CLOCKWISE, scaleX(-1) = ANTI-CLOCKWISE */
+
 .base-timer__svg {
   transform: scaleX(1);
 }
@@ -246,3 +246,4 @@ section .fill {
   left: 0;
   z-index: -1;
 }
+*/

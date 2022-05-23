@@ -41,7 +41,7 @@ export default function AuthModal() {
                             <button onClick={logOut}>Logout</button>
                         </div>
                     } 
-                <Link to="/profile">Profile</Link>
+                
         </div> 
 
     )

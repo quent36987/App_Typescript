@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Route, Switch, RouteComponentProps } from 'react-router-dom';
 import Alert from './componants/Alert';
+import HeaderBar from './componants/Header';
 import logging from './config/logging';
 import routes from './config/routes';
+
 
 const Application: React.FunctionComponent<{}> = props => {
     useEffect(() => {
@@ -12,6 +14,7 @@ const Application: React.FunctionComponent<{}> = props => {
     return (
         <div>
             <BrowserRouter>
+            <HeaderBar/>
                 <Switch>
                     {routes.map((route, index) => {
                         return (
