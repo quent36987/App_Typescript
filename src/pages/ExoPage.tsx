@@ -29,16 +29,14 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
 
 
     
-
-
-    
     useEffect(() => {
-    async function etst() {
+       async function etst() {
         if (user) {
             const docRef = doc(db, "Users", user.uid);
             try {
-                const doc = await getDoc(docRef);
-                setListUser(doc.data().exo_log);
+                const docc = await getDoc(docRef);
+                setListUser(docc.data().exo_log);
+                console.log("data");
             } catch (e) {
 
                 console.log("Error getting cached document:", e);
@@ -46,7 +44,7 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
         }
     };
     etst();
-}, [user]);
+}, [props]);
 
 
 

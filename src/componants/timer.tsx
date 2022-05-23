@@ -1,6 +1,6 @@
-import {  arrayUnion, doc,  updateDoc } from "firebase/firestore";
+/*import {  arrayUnion, doc,  updateDoc } from "firebase/firestore";
 import { AppState } from "../Context";
-import { db } from "../firebase";
+import { db } from "../firebase";*/
 import "./timer.css";
 
 export type TimerProps = {
@@ -34,7 +34,7 @@ type TypeTimer = {
 
 
 const Timer = (Prop: TimerProps) => {
-  const { user } = AppState();
+  //const { user } = AppState();
 
   //const
   const FULL_DASH_ARRAY = 283;
@@ -218,6 +218,7 @@ const Timer = (Prop: TimerProps) => {
 
 
   function start() {
+    console.log("ee");
     if (!startBtn) {
       //DOM elements
       timer = document.querySelector("#base-timer-path-remaining") as HTMLElement;
@@ -285,7 +286,8 @@ const Timer = (Prop: TimerProps) => {
   }
 
   async function finish()  {
-    if (user)
+    console.log("eee");
+   /* if (user)
     {
       const UserDocRef = doc(db, 'Users', user.uid);
       const payload = { exo_log : arrayUnion({date : Date.now() , exo : Prop.exercise_id } ) };          
@@ -299,7 +301,7 @@ const Timer = (Prop: TimerProps) => {
     }
     else {
 
-    }
+    }*/
     reset();
     window.location.href = "/chrono";
   };
