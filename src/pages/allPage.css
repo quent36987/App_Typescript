@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,500&display=swap');
+
+.HomePage {
+    font-family: 'Montserrat', sans-serif;
+    align-items: center;
+    margin-top: 6vh;
+    display: block;
+    text-align: center;
+}
+.Titre {
+    font-size: 8vw;
+}
+.HomePage-content {
+ 
+    padding: 4vw;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2vh;
+    display: flex;
+    flex-direction: row;
+}
+.HomePage-content-quote-right {
+    font-size: 10vw;
+    float: right;
+    position: relative;
+    top: 7vw;
+}
+.HomePage-content-quote-left {
+    font-size: 10vw;
+    float: left;
+    position: relative;
+    top: -2vw;
+}
+.HomePage-content-text {
+    font-size: 2.5vw;
+    margin-top: 3vh;
+}

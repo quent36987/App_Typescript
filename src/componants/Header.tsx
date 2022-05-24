@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 import React from "react"
-import { Nav, Navbar } from "react-bootstrap"
+import { Button, Form, FormControl, Nav, Navbar, NavDropdown } from "react-bootstrap"
 
 //import "./Header.css"
 
@@ -12,19 +12,24 @@ const App = () => {
       expand="md"
       bg="light"
       variant="light"
-      className="px-4 py-8"
-     
+      className="px-3 py-8"
     >
-      <Navbar.Brand>Sport APP</Navbar.Brand>
+      <Navbar.Brand href="/">
+        AppSport
+      </Navbar.Brand>
       <Navbar.Toggle aria-controls="responsive-navbar-na" />
       <Navbar.Collapse id="responsive-navbar-nav">
-        <Nav className="mr-auto align-items-end px-3">
-          <Nav.Link>Home</Nav.Link>
-          <Nav.Link>Products</Nav.Link>
+        <Nav className="me-auto px-2">
+          <NavDropdown title="Séances" id="basic-nav-dropdown">
+            <NavDropdown.Item href="/chrono">Toutes les séances</NavDropdown.Item>
+            <NavDropdown.Item href="/chronoform">Créer une séance</NavDropdown.Item>
+            <NavDropdown.Divider />
+            <NavDropdown.Item href="/">Plus d'info ?</NavDropdown.Item>
+          </NavDropdown>
+          <Nav.Link href="/profile" >Profile</Nav.Link>
         </Nav>
-        <Nav className="ml-auto align-items-end px-3">
-          
-          <Nav.Link className="pl-4">Cart</Nav.Link>
+        <Nav>
+          <Button variant="outline-success">Login</Button>
         </Nav>
       </Navbar.Collapse>
     </Navbar>

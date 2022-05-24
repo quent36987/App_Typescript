@@ -40,8 +40,8 @@ const ProfilePage: React.FunctionComponent<IPage & RouteComponentProps<any>> = p
 
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
-        if (!user) {
-            props.history.push('/');
+        if (user) {
+           // props.history.push('/');
             setAlert({
                 open: true,
                 message: "you must be logged in to access this page",

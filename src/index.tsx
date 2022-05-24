@@ -4,8 +4,7 @@ import Application from './application';
 import Context from './Context';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap/dist/js/bootstrap.bundle.js';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
 
 ReactDOM.render(
   <React.StrictMode>
