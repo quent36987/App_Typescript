@@ -35,3 +35,27 @@
     font-size: 2.5vw;
     margin-top: 3vh;
 }
+
+
+.AuthPage {
+    font-family: 'Montserrat', sans-serif;
+    align-items: center;
+    margin-top: 1vh;
+    display: block;
+    text-align: center;
+}
+
+.AuthPage-content {
+
+    margin-top: 5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+.AuthPage-content-form-signup{
+    width: 40em;
+}
+.AuthPage-content-form-login{
+    width: 20em;
+}

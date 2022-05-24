@@ -41,14 +41,13 @@ const ProfilePage: React.FunctionComponent<IPage & RouteComponentProps<any>> = p
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
         if (user) {
-           // props.history.push('/');
             setAlert({
                 open: true,
                 message: "you must be logged in to access this page",
                 type: "error",
             });
         }
-    }, [props])
+    }, [props] )
 
 
     useEffect(() => {
@@ -72,11 +71,16 @@ const ProfilePage: React.FunctionComponent<IPage & RouteComponentProps<any>> = p
     return (
         <div>
             <Link to="/">Go to the home page!</Link>
-            {userdata ? 
+            {userdata  ? 
             <div>
                 <h1>nom : {userdata.name}</h1>
-                <h1>nombre exo fini : {userdata.exo.length}</h1>
+
+                {userdata.exo ? <>
+                <h1>nombre exo fini : { userdata.exo.length}</h1>
                 <h6>exo fini : {userdata.exo.map(exo => exo.exo  + "\n" )}</h6>
+               </> : null
+                }
+
                 <h1>rajouter stats blabla</h1>
             </div>
             : <div>loading</div>}

@@ -25,6 +25,7 @@
     "browserify-fs": "^1.0.0",
     "dotenv": "^16.0.1",
     "firebase": "^9.8.1",
+    "formik": "^2.2.9",
     "jquery": "^3.6.0",
     "popper.js": "^1.16.1",
     "react": "^17.0.1",

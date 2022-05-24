@@ -2,9 +2,12 @@ import { useState } from "react";
 import { auth } from "./../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { AppState } from "../Context";
+import { Button, Form } from "react-bootstrap";
+import { Link } from "@material-ui/core";
 
 
-const Login = ({ handleClose }) => {
+
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { setAlert } = AppState();
@@ -23,14 +26,13 @@ const Login = ({ handleClose }) => {
 
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
-      console.log("Sign Up Successful. Welcome" + result.user.email);
+      console.log("Sign Up Successful. Welcome" + result.user.email); 
+      window.location.href = "/";
       setAlert({
         open: true,
         message: `Sign Up Successful. Welcome ${result.user.email}`,
         type: "success",
       });
-
-      handleClose();
     } catch (error) {
       console.log(error.message);
       setAlert({
@@ -42,27 +44,33 @@ const Login = ({ handleClose }) => {
     }
   };
 
+
   return (
-    <div>
 
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        value={password}
+    <Form>
+      <Form.Group className="mb-3" controlId="formBasicEmail">
+        <Form.Label >Email address</Form.Label>
+        <Form.Control 
+         type="email"
+         name="email"
+         value={email}
+         onChange={(e) => setEmail(e.target.value)}
+        placeholder="Enter email"  />
+      </Form.Group>
+      <Form.Group className="mb-3" controlId="formBasicPassword">
+        <Form.Label>Password</Form.Label>
+        <Form.Control 
+         type="password"
+         name="password"
+         value={password}
         onChange={(e) => setPassword(e.target.value)}
-      />
-      <button
-
-        onClick={handleSubmit}
-        style={{ backgroundColor: "#EEBC1D" }}
-      >
-        Login
-      </button>
-    </div>
+         placeholder="Password" />
+      </Form.Group>
+      <p>Pas encore enregistré ? <Link href="/auth/signup" >Clic ici !</Link></p>
+      <Button onClick={handleSubmit} >
+        Submit
+      </Button>
+    </Form>
   );
 };
 

@@ -3,6 +3,7 @@ import ProfilePage from '../pages/ProfilePage';
 import HomePage from '../pages/HomePage';
 import ChronoPage from '../pages/ExoPage';
 import ChronoForm from '../pages/NewExoPage';
+import AuthPage from '../pages/AuthPage';
 
 const routes: IRoute[] = [
     {
@@ -35,6 +36,12 @@ const routes: IRoute[] = [
         component: ChronoForm,
         exact: true
     },
+    {
+        path: '/auth/:type',
+        name: 'Auth Page',
+        component: AuthPage,
+        exact: true
+    }
 ]
 
 export default routes;

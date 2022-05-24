@@ -4,23 +4,20 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { AppState } from "../Context";
 import { doc, setDoc } from "firebase/firestore";
+import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
+import { Link } from "@material-ui/core";
 
-const Signup = ({ handleClose }) => {
+
+const Signup = () => {
+  const [validated, setValidated] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [genre, setGenre] = useState("");
   const { setAlert } = AppState();
 
-  const handleSubmit = async () => {
-    if (password !== confirmPassword) {
-      console.log("password and confirm password are not the same");
-      setAlert({
-        open: true,
-        message: "Passwords do not match",
-        type: "error",
-      });
-      return;
-    }
+  async function add() {
     try {
       const result = await createUserWithEmailAndPassword(
         auth,
@@ -29,8 +26,10 @@ const Signup = ({ handleClose }) => {
       );
       console.log("Sign Up Successful. Welcome" + result.user.email);
       try {
-        await  setDoc(doc(db, "Users", result.user.uid), {
-          name: "",
+        await setDoc(doc(db, "Users", result.user.uid), {
+          firstName: firstName,
+          lastName: lastName,
+          
         });
         setAlert({
           open: true,
@@ -38,16 +37,14 @@ const Signup = ({ handleClose }) => {
           type: "success",
         });
       }
-      catch (error)
-      {
+      catch (error) {
         console.log(error);
         setAlert({
           open: true,
           type: "error",
-          message: "Error on creating user"});
+          message: "Error on creating user"
+        });
       }
-
-      
     } catch (error) {
       console.log("error" + error.message);
       setAlert({
@@ -59,40 +56,101 @@ const Signup = ({ handleClose }) => {
     }
   };
 
+
+  const handleSubmit = (event) => {
+    const form = event.currentTarget;
+    event.preventDefault();
+    event.stopPropagation();
+    if (form.checkValidity() === true) {
+      add();
+    }
+    setValidated(true);
+    console.log(genre);
+  };
+
   return (
-    <div>
-      <input
-
-        type="email"
-
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-
-      />
-      <input
-
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-
-      />
-      <input
-
-        type="password"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-
-      />
-      <button
-
-
-        style={{ backgroundColor: "#EEBC1D" }}
-        onClick={handleSubmit}
-      >
-        Sign Up
-      </button>
-    </div>
+    <Form noValidate validated={validated} onSubmit={handleSubmit}>
+      <Row className="mb-3">
+        <Form.Group as={Col} md="4" controlId="validationCustom01"  >
+          <Form.Label>Genre</Form.Label>
+          <Form.Select aria-label="" value={genre}
+            onChange={(e) => {setGenre(e.target.value)}}
+            required
+          >
+            <option value="no">Select</option>
+            <option value="Homme">Homme</option>
+            <option value="Femme">Femme</option>
+          </Form.Select>
+        </Form.Group>
+        <Form.Group as={Col} md="4" controlId="validationCustom01">
+          <Form.Label>First name</Form.Label>
+          <Form.Control
+            required
+            type="text"
+            placeholder="First name"
+            defaultValue=""
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+          <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+        </Form.Group>
+        <Form.Group as={Col} md="4" controlId="validationCustom02">
+          <Form.Label>Last name</Form.Label>
+          <Form.Control
+            required
+            type="text"
+            placeholder="Last name"
+            defaultValue=""
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+          />
+          <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+        </Form.Group>
+      </Row>
+      <Row className="mb-3">
+        <Form.Group as={Col} md="6" controlId="validationCustomUsername">
+          <Form.Label>Email</Form.Label>
+          <InputGroup hasValidation>
+            <InputGroup.Text id="inputGroupPrepend">@</InputGroup.Text>
+            <Form.Control
+              type="email"
+              placeholder="Username"
+              aria-describedby="inputGroupPrepend"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Form.Control.Feedback type="invalid">
+              Please enter your email.
+            </Form.Control.Feedback>
+          </InputGroup>
+        </Form.Group>
+        <Form.Group as={Col} md="6" controlId="validationCustomUsername">
+          <Form.Label>Password</Form.Label>
+          <InputGroup hasValidation>
+            <InputGroup.Text id="inputGroupPrepend">🔑</InputGroup.Text>
+            <Form.Control
+              type="password"
+              placeholder="Password"
+              aria-describedby="inputGroupPrepend"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Form.Control.Feedback type="invalid">
+              Please enter your password.
+            </Form.Control.Feedback>
+          </InputGroup>
+        </Form.Group>
+        <Form.Text id="passwordHelpBlock" muted>
+    Your password must be 8-20 characters long, contain letters and numbers, and
+    must not contain spaces, special characters, or emoji.
+  </Form.Text>
+      </Row>
+      <p>already have an account ? <Link href="/auth/login" >Log in here !</Link></p>
+      <Button variant="primary" type="submit">Register</Button>
+    </Form>
   );
-};
+}
 
 export default Signup;

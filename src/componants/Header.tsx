@@ -1,7 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-
-import React from "react"
-import { Button, Form, FormControl, Nav, Navbar, NavDropdown } from "react-bootstrap"
+import { Button, Nav, Navbar, NavDropdown } from "react-bootstrap"
 
 //import "./Header.css"
 
@@ -29,7 +27,7 @@ const App = () => {
           <Nav.Link href="/profile" >Profile</Nav.Link>
         </Nav>
         <Nav>
-          <Button variant="outline-success">Login</Button>
+          <Button variant="outline-success" href="/auth/login" >Login</Button>
         </Nav>
       </Navbar.Collapse>
     </Navbar>
