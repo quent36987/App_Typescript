@@ -55,6 +55,7 @@ const Login = () => {
          name="email"
          value={email}
          onChange={(e) => setEmail(e.target.value)}
+         autoComplete="email"
         placeholder="Enter email"  />
       </Form.Group>
       <Form.Group className="mb-3" controlId="formBasicPassword">
@@ -62,6 +63,7 @@ const Login = () => {
         <Form.Control 
          type="password"
          name="password"
+         autoComplete="current-password"
          value={password}
         onChange={(e) => setPassword(e.target.value)}
          placeholder="Password" />

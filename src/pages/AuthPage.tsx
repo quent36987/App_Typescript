@@ -35,7 +35,6 @@ const AuthPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = prop
         }
       } 
 
-
     return (
         <div className='AuthPage'>
             <h1 className='Titre2' >{titre}</h1>

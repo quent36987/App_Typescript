@@ -29,13 +29,14 @@ const Signup = () => {
         await setDoc(doc(db, "Users", result.user.uid), {
           firstName: firstName,
           lastName: lastName,
-          
+          genre: genre,
         });
         setAlert({
           open: true,
           message: `Sign Up Successful. Welcome ${result.user.email}`,
           type: "success",
         });
+        window.location.href = "/";
       }
       catch (error) {
         console.log(error);
@@ -71,7 +72,7 @@ const Signup = () => {
   return (
     <Form noValidate validated={validated} onSubmit={handleSubmit}>
       <Row className="mb-3">
-        <Form.Group as={Col} md="4" controlId="validationCustom01"  >
+        <Form.Group as={Col} md="4" controlId="validationCustom0"  >
           <Form.Label>Genre</Form.Label>
           <Form.Select aria-label="" value={genre}
             onChange={(e) => {setGenre(e.target.value)}}
@@ -88,18 +89,20 @@ const Signup = () => {
             required
             type="text"
             placeholder="First name"
+            autoComplete="given-name"
             defaultValue=""
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
           />
           <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
         </Form.Group>
-        <Form.Group as={Col} md="4" controlId="validationCustom02">
+        <Form.Group as={Col} md="4" controlId="validationCustom03">
           <Form.Label>Last name</Form.Label>
           <Form.Control
             required
             type="text"
             placeholder="Last name"
+            autoComplete="lname"
             defaultValue=""
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
@@ -108,13 +111,14 @@ const Signup = () => {
         </Form.Group>
       </Row>
       <Row className="mb-3">
-        <Form.Group as={Col} md="6" controlId="validationCustomUsername">
+        <Form.Group as={Col} md="6" controlId="validationCustom04">
           <Form.Label>Email</Form.Label>
           <InputGroup hasValidation>
-            <InputGroup.Text id="inputGroupPrepend">@</InputGroup.Text>
+            <InputGroup.Text id="inputGroupPrepend1">@</InputGroup.Text>
             <Form.Control
               type="email"
-              placeholder="Username"
+              placeholder="Email"
+              autoComplete="email"
               aria-describedby="inputGroupPrepend"
               required
               value={email}
@@ -125,13 +129,14 @@ const Signup = () => {
             </Form.Control.Feedback>
           </InputGroup>
         </Form.Group>
-        <Form.Group as={Col} md="6" controlId="validationCustomUsername">
+        <Form.Group as={Col} md="6" controlId="validationCustom05">
           <Form.Label>Password</Form.Label>
           <InputGroup hasValidation>
-            <InputGroup.Text id="inputGroupPrepend">🔑</InputGroup.Text>
+            <InputGroup.Text id="inputGroupPrepend2">🔑</InputGroup.Text>
             <Form.Control
               type="password"
               placeholder="Password"
+              autoComplete="new-password"
               aria-describedby="inputGroupPrepend"
               required
               value={password}
