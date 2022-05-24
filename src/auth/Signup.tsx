@@ -30,6 +30,7 @@ const Signup = () => {
           firstName: firstName,
           lastName: lastName,
           genre: genre,
+          date_inscription: Date.now(),
         });
         setAlert({
           open: true,
