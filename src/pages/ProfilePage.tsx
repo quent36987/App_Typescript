@@ -201,11 +201,11 @@ const ProfilePage: React.FunctionComponent<IPage & RouteComponentProps<any>> = p
                     </div>
                     <div className='div-Profile-info-item'>
                         <span className='titreitem'>Date inscription</span>
-                        <span className='valeuritem'> {userdata.date_inscription.toDate().toDateString()} </span>
+                        <span className='valeuritem'> {userdata.date_inscription !== undefined ? userdata.date_inscription.toDate().toDateString() : null} </span>
                     </div>
                     <div className='div-Profile-info-item'>
                         <span className='titreitem'>Dernier séance faite</span>
-                        <span className='valeuritem'> { userdata.last_exo_date.toDate().toDateString()} </span>
+                        <span className='valeuritem'> {!userdata.last_exo_date !== undefined ? userdata.last_exo_date.toDate().toDateString() : null} </span>
                     </div>
                     <div className='div-Profile-info-item'>
                         <span className='titreitem'>Temps total</span>
@@ -218,7 +218,7 @@ const ProfilePage: React.FunctionComponent<IPage & RouteComponentProps<any>> = p
             </div>
         </div>
         <div className='div-Profile-exo'>
-            <Tabs defaultActiveKey="profile" id="uncontrolled-tab-example" className="mb-3">
+            <Tabs defaultActiveKey="home" id="uncontrolled-tab-example" className="mb-3">
             <Tab eventKey="home" title="Exercices" style={{"maxWidth" : "90vw", 
                                                     "paddingLeft" : "4vw", 
                                                     "paddingRight" : "4vw"}}>

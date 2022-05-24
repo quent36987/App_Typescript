@@ -55,12 +55,14 @@
 }
 .AuthPage-content-form-signup{
     width: 40em;
+    margin-left: 3vw;
+    margin-right: 3vw;
 }
 .AuthPage-content-form-login{
     width: 20em;
+    margin-left: 3vw;
+    margin-right: 3vw;
 }
-
-
 
 .divDashboard{
     display: flex;
@@ -128,4 +130,26 @@
 {
     margin-top: 0;
     font-size: 20px;
+}
+
+.NewExoPage-content{
+    margin-top: 5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+.NewExoPage-content-form{
+
+    width: "100%";
+    margin-left: 2vw;
+    margin-right: 2vw;
+}
+.Titre3{
+    font-size: 2vw;
+    border-bottom:1px solid rgb(129, 127, 127);
+    margin-bottom: 1vh;
+    margin-top: 4vh;
+    margin-right: 4vh;
+    margin-left: 4vh;
 }
