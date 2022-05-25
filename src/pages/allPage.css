@@ -87,6 +87,7 @@
     -webkit-box-shadow: 0 0 20px rgba(38, 38, 38, 0.2);
     flex-grow: 2;
     box-shadow: 0 0 20px rgba(38, 38, 38, 0.2);
+    
 }
 .div-Profile{
     display: flex;
@@ -152,4 +153,13 @@
     margin-top: 4vh;
     margin-right: 4vh;
     margin-left: 4vh;
+}
+
+.itemrest{
+    box-shadow: 0 0 10px rgba(57, 168, 42, 0.2);
+    color: #2f8c2f;
+}
+.itemexo{
+    box-shadow: 0 0 10px rgba(146, 28, 28, 0.2);
+    color: #942f2f;
 }

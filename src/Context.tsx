@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./firebase";
+import { auth, db } from "./firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 const App = createContext(null);
 const Context = ({ children }) => {
@@ -10,6 +11,7 @@ const Context = ({ children }) => {
         message: "",
         type: "success",
     });
+    const [perm, setPerm] = useState(false);
     const [user, setUser] = useState(null);
 
     useEffect(() => {
@@ -19,6 +21,21 @@ const Context = ({ children }) => {
         });
     }, []);
 
+    async function isadm() {
+        if (!user || perm) {
+            return;
+        }
+        console.log('user :', user);
+        const ref = doc(db, "ADM", user.uid);
+        const docSnap = await getDoc(ref);
+        if (docSnap.exists()) {
+            setPerm(docSnap.data().perm);
+        }
+    }
+    useEffect(() => {
+        isadm();
+    },[user]);
+
 
     return (
         <App.Provider
@@ -26,6 +43,7 @@ const Context = ({ children }) => {
                 alert,
                 setAlert,
                 user,
+                perm,
             }}
         >
             {children}

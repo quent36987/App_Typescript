@@ -1,49 +1,55 @@
 import React, { useEffect, useState } from 'react';
 import IPage from '../interfaces/page';
 import logging from '../config/logging';
-import { Link } from 'react-router-dom';
-import VerticalList from '../componants/formExo';
-import { Button, Col, FloatingLabel, Form, InputGroup, Row } from 'react-bootstrap';
-import './allPage.css';
+import { Button, Col, FloatingLabel, Form, FormControl, InputGroup, Row, ToggleButton } from 'react-bootstrap';
 import RLDD from 'react-list-drag-and-drop/lib/RLDD';
-import { TextField } from '@material-ui/core';
 import './allPage.css';
+import { addDoc, arrayUnion, collection, doc, Timestamp, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+import { AppState } from '../Context';
+
 
 
 type Item = {
     id: number;
     name: string;
     time: number;
+    type: number; //0 exo  1 rest
+    time_inf:boolean;
 }
 const data = [
     {
-        id : 0,
-        name : "select the seance mode you want",
-        description : "This saves time to create the series of exercises",
+        id: 0,
+        name: "Select the seance mode you want",
+        description: "This saves time to create the series of exercises",
     },
     {
-        id : 1,
-        name : "Tabata",
-        description : "A tabata is a cardio session where you do different exercises with the same time",
+        id: 1,
+        name: "Tabata",
+        description: "A tabata is a cardio session where you do different exercises with the same time",
     },
     {
-        id : 2,
-        name : "Emom",
-        description : "bla bla bla",
+        id: 2,
+        name: "Pyramide",
+        description: "Not implemented yet",
     },
     {
-        id : 3,
-        name : "Serie Exo",
-        description : "bla bla bla",
+        id: 3,
+        name: "Serie Exo",
+        description: "Simple serie of differents exercises",
     },
     {
-        id : 4,
-        name : "Full Custom",
-        description : "bla bla bla",
+        id: 4,
+        name: "Full Custom",
+        description: "Full Custom session, you can add exercises with time or not and rest or not bewteen exercises",
     },
 ]
 
+
 const ChronoForm: React.FunctionComponent<IPage> = props => {
+
+    const { user, setAlert, perm } = AppState();
+
     const [type, setType] = React.useState(0);
 
     const [titre, setTitre] = React.useState("");
@@ -54,9 +60,11 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
 
     const [exercices_time, setExercices_time] = React.useState(0);
     const [rest_time, setRest_time] = React.useState(0);
-    const [Number_of_exercises, setNumber_of_exercises] = React.useState(0);
+    const [time_cycle, setTime_cycle] = React.useState(0);
 
     const [items, setItems] = useState<Item[]>([]);
+
+    const [isPublic, setIsPublic] = useState(false);
 
     const [validated, setValidated] = useState(false);
     const [change, setChange] = useState(false);
@@ -70,20 +78,21 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
         const form = event.currentTarget;
         event.preventDefault();
         event.stopPropagation();
-        if (form.checkValidity() === false) {
-
+        if (form.checkValidity() === true && items.length > 0) {
+            sendToFirebase();
         }
-
         setValidated(true);
     };
 
-    const addItem = () => {
+    const addItem = (type: number) => {
         console.log("addItem");
         const i = items;
         i.push({
             id: i.length === 0 ? 0 : i.sort((a, b) => a.id - b.id)[i.length - 1].id + 1,
-            name: "nouveau",
+            name: "rest",
             time: 0,
+            type: type,
+            time_inf:false,
         });
         setItems(i);
         setChange(!change);
@@ -99,34 +108,73 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
 
     const itemRenderer = (item: Item, index: number): JSX.Element => {
 
-        const handleChange = (e, itemId) => {
+        const handleChangeName = (e, itemId) => {
             const i = items;
             const index = i.findIndex(item => item.id === itemId);
             i[index].name = e.target.value;
             handleRLDDChange(i);
         };
+        const handleChangeTime = (e, itemId) => {
+            const i = items;
+            const index = i.findIndex(item => item.id === itemId);
+            i[index].time = parseInt(e.target.value);
+            handleRLDDChange(i);
+        };
+        const handleChangeTimeing = (e, itemId) => {
+            const i = items;
+            const index = i.findIndex(item => item.id === itemId);
+            i[index].time_inf = ! i[index].time_inf
+            handleRLDDChange(i);
+            setChange(!change);
+        };
 
         return (
             <div >
                 <InputGroup className="mb-3 " >
-                    <FloatingLabel
-                        label="Name of Exercise"
-                        style={{ width: "100%" }}
-                    >
-                        <Form.Control
-                            id={"f"+item.id.toString()}
-                            onClick={(e) => document.getElementById("f" + item.id.toString()).focus()}
-                            onChange={(e) => handleChange(e, item.id)}
-                            type="text" placeholder="name@example.com"
-                            required
-
+                    {item.type === 0 ?
+                        <FormControl
+                        className='itemexo'
+                        placeholder="Name of Exercise"
+                        type="text"
+                        id={"f" + item.id.toString()}
+                        onClick={(e) => document.getElementById("f" + item.id.toString()).focus()}
+                                                        onChange={(e) => handleChangeName(e, item.id)}
+                        style={{"width":"60%"}}
+                        required
                         />
-                    </FloatingLabel>
-                    <Button variant="btn btn-outline-danger" id={"button-addon2"+item.id.toString()}
-                        style={{
-                            "position": "absolute", "right": "0px",
-                            "top": "0px", "width": "10%", "height": "100%"
-                        }}
+                        :
+                        <FormControl
+                        className='itemrest'
+                        placeholder="Rest Time"
+                        disabled
+                        type="text"
+                        id={"f" + item.id.toString()}
+                        onClick={(e) => document.getElementById("f" + item.id.toString()).focus()}
+                                                        onChange={(e) => handleChangeName(e, item.id)}
+                        style={{"width":"60%"}}
+                        />
+                    }
+                    {type === 4  ? <>
+                         <FormControl   aria-label="Last name"  type='number' placeholder="Time in s"
+                         id={"id2" + item.id.toString()}
+                         onClick={(e) => document.getElementById("id2" + item.id.toString()).focus()}
+                         onChange={(e) => handleChangeTime(e, item.id)}
+                         required={!item.time_inf} 
+                         disabled={item.time_inf}/>
+                         <ToggleButton
+                                 id={"binrf" + item.id.toString()}
+                                 type="checkbox"
+                                 variant="outline-secondary"
+                                 checked={item.time_inf}
+                                 value="1"
+                                 onChange={(e) => { handleChangeTimeing(e,item.id);
+                                 }}
+                             >
+                                 ♾️
+                             </ToggleButton>
+                             </>  : null}
+                   
+                    <Button variant="btn btn-outline-danger" id={"button-addon2" + item.id.toString()}
                         onClick={() => removeItem(item.id)}  >
                         🗑️
                     </Button>
@@ -142,27 +190,103 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
 
 
 
+    const sendToFirebase = async () => {
+        // calculate the exercises 
+        var exercises: Item[] = [];
+        var lengthItem = items.length;
+        let index_exo = 0;
+        switch (type) {
+            case 1:  // Tabata = > exo + rest... (time of cycle tabata)
+                while (index_exo * (rest_time + exercices_time) < time_cycle) {
+                    var exo = items[index_exo % lengthItem];
+                    exo.time = exercices_time;
+                    exercises.push(exo);
+                    if ((index_exo + 1) * (rest_time + exercices_time) < time_cycle) {
+                        exercises.push({ id: 0, name: "rest", type: 1, time: rest_time,time_inf:false })
+                    }
+                    index_exo++;
+                }
+
+                break;
+            case 2: //Pyramide all cycle we change the 
+
+                break;
+            case 3: // Serie Exo (add rest time beteewn exo)
+                for (let exo = 0; exo < lengthItem; exo++) {
+                    exercises.push(items[exo]);
+                    if (exo < lengthItem - 1) {
+                        exercises.push({ id: 0, name: "rest", type: 1, time: rest_time ,time_inf : false})
+                    }
+                }
+                break;
+            case 4:  // Full Custom
+                exercises = items;
+                break;
+            default:
+                break;
+        }
+
+        //send the message
+        const payload = {
+            titre: titre,
+            date: Timestamp.now(),
+            cycles: cycles,
+            recovery_time: recovery,
+            type: type,
+            description: description,
+            rest_time: rest_time,
+            exercises: exercises,
+            useruid: user.uid,
+        };
+        try {
+            if (isPublic) {
+                const collectionRef = collection(db, "exercises");
+                await addDoc(collectionRef, payload);
+            }
+            else {
+                const UserDocRef = doc(db, 'Users', user.uid);
+                await updateDoc(UserDocRef,{exercises : arrayUnion(payload)});
+            }
+            console.log("addDoc success");
+            setAlert({
+                open: true,
+                type: "success",
+                message: "Add !"
+            });
+        }
+        catch (error) {
+            console.log(error);
+            setAlert({
+                open: true,
+                type: "error",
+                message: "Network error or user error"
+            });
+        }
+
+
+    }
+
 
     return (
         <div className='AuthPage'>
+            {user ? <>
             <h1 className='Titre2' >Create your own tailor-made sports session</h1>
             <div className="NewExoPage-content">
-                <div className='NewExoPage-content-form' style={{"maxWidth":"700px"}}>
+                <div className='NewExoPage-content-form' style={{ "maxWidth": "700px" }}>
                     <Form noValidate validated={validated} onSubmit={handleSubmit}>
                         <Row className="mb-3">
                             <Form.Select value={type} onChange={(e) => setType(parseInt(e.target.value))}
                                 aria-label="Default select example"
-                                required >
+                                required
+                            >
                                 {data.map((item, index) => (
                                     <option key={index} value={item.id}>{item.name}</option>
                                 ))}
                             </Form.Select>
                             <Form.Text className="text-muted" >
-                              {data[type].description}
+                                {data[type].description}
                             </Form.Text>
                         </Row>
-
-
                         {type === 0 ? <></> : <>
                             <Row className="mb-3">
                                 <Form.Group as={Col} controlId="titreid">
@@ -209,44 +333,44 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                     onChange={(e) => setDescription(e.target.value)}
                                 />
                             </FloatingLabel>
-                            { type !== 4 ? <>
-                            <Row className="mb-3">
-                                <Form.Group as={Col} controlId="exotimeid">
-                                    <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Exercise time</Form.Label>
-                                    <Form.Control
-                                        size='sm'
-                                        required
-                                        type="number"
-                                        placeholder="in seconds"
-                                        disabled={type === 3}
-                                        value={exercices_time ? exercices_time : ""}
-                                        onChange={(e) => setExercices_time(parseInt(e.target.value))}
-                                    />
-                                </Form.Group>
-                                <Form.Group as={Col} controlId="resttimeid">
-                                    <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Rest Time</Form.Label>
-                                    <Form.Control
-                                        size='sm'
-                                        required
-                                        type="number"
-                                        placeholder="in seconds"
-                                        value={rest_time ? rest_time : ""}
-                                        onChange={(e) => setRest_time(parseInt(e.target.value))}
-                                    />
-                                </Form.Group>
-                                <Form.Group as={Col} controlId="nbpercycle">
-                                    <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Number of exercises</Form.Label>
-                                    <Form.Control
-                                        size='sm'
-                                        required
-                                        type="number"
-                                        placeholder="per cycle"
-                                        disabled={type === 3}
-                                        value={Number_of_exercises ? Number_of_exercises : ""}
-                                        onChange={(e) => setNumber_of_exercises(parseInt(e.target.value))}
-                                    />
-                                </Form.Group>
-                            </Row>
+                            {type !== 4 ? <>
+                                <Row className="mb-3">
+                                    <Form.Group as={Col} controlId="exotimeid">
+                                        <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Exercise time</Form.Label>
+                                        <Form.Control
+                                            size='sm'
+                                            required
+                                            type="number"
+                                            placeholder="in seconds"
+                                            disabled={type === 3}
+                                            value={exercices_time ? exercices_time : ""}
+                                            onChange={(e) => setExercices_time(parseInt(e.target.value))}
+                                        />
+                                    </Form.Group>
+                                    <Form.Group as={Col} controlId="resttimeid">
+                                        <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Rest Time</Form.Label>
+                                        <Form.Control
+                                            size='sm'
+                                            required
+                                            type="number"
+                                            placeholder="in seconds"
+                                            value={rest_time ? rest_time : ""}
+                                            onChange={(e) => setRest_time(parseInt(e.target.value))}
+                                        />
+                                    </Form.Group>
+                                    <Form.Group as={Col} controlId="nbpercycle">
+                                        <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Time of 1 Cycle</Form.Label>
+                                        <Form.Control
+                                            size='sm'
+                                            required
+                                            type="number"
+                                            placeholder="in seconds"
+                                            disabled={type === 3}
+                                            value={time_cycle ? time_cycle : ""}
+                                            onChange={(e) => setTime_cycle(parseInt(e.target.value))}
+                                        />
+                                    </Form.Group>
+                                </Row>
                             </> : null}
                             <h1 className='Titre3' >List of exercises : {items.length}</h1>
                             <div >
@@ -257,32 +381,45 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                     onChange={handleRLDDChange}
                                 />
                             </div>
-                            { type === 4 ? 
-                            <div>
-                                <Button variant="btn btn-outline-secondary" style={{
-                                    "width": "80%",
-                                    "marginBottom": "10px"
-                                }} onClick={addItem}>
-                                    Add Rest
-                                </Button>
-                            </div>
-                            : null }  
+                            {type === 4 ?
+                                <div>
+                                    <Button variant="btn btn-outline-secondary" style={{
+                                        "width": "80%",
+                                        "marginBottom": "10px"
+                                    }} onClick={() => addItem(1)}>
+                                        Add Rest
+                                    </Button>
+                                </div>
+                                : null}
                             <div>
                                 <Button variant="btn btn-outline-secondary" style={{
                                     "width": "80%",
                                     "marginBottom": "30px"
-                                }} onClick={addItem}>
+                                }} onClick={() => addItem(0)}>
                                     Add Exercise
                                 </Button>
                             </div>
+                            {perm ?
+                                <Row className="mb-3" style={{ "textAlign": "left", "marginLeft": "20px" }} >
+                                    <Form.Check
+                                        type="switch"
+                                        id="custom-switchpublic"
+                                        label="Session Public"
+                                        onChange={(e) => setIsPublic(e.target.checked)}
+                                    />
+                                </Row>
+                                : null}
                             <Button variant="btn btn-outline-success" type="submit">
                                 Submit
                             </Button>
-
                         </>}
                     </Form>
                 </div>
             </div>
+            </>: <>
+            <h1 className='Titre2' >Log in to create personalized sessions!</h1>
+            <Button onClick={() => window.location.href = "/auth/login"}>Log in !</Button>
+             </> }
         </div>
     )
 

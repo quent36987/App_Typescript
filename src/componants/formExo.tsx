@@ -39,7 +39,10 @@ export default class VerticalList extends React.PureComponent<{}, State> {
   }
 
 
+  
 
+
+/*
   render() {
 
     const handleChange = (e) => {
@@ -149,7 +152,7 @@ export default class VerticalList extends React.PureComponent<{}, State> {
       </div>
     );
   }
-
+*/
 
   addPost = async () => {
     const collectionRef = collection(db, "exercices");
