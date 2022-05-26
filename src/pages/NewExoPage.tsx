@@ -262,7 +262,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                 {data[type].description}
                             </Form.Text>
                         </Row>
-                        {type === 0 ? <></> : <>
+                        {type === 0 || type == 2? <></> : <>
                             <Row className="mb-3">
                                 <Form.Group as={Col} controlId="titreid">
                                     <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Titre</Form.Label>
