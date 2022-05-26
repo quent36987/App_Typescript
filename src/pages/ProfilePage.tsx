@@ -3,10 +3,10 @@ import IPage from '../interfaces/page';
 import logging from '../config/logging';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { AppState } from '../Context';
-import { doc, getDoc, Timestamp } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import './allPage.css';
-import { Spinner, Tab, Tabs } from 'react-bootstrap';
+import { Button, Spinner, Tab, Tabs } from 'react-bootstrap';
 import { Avatar } from '@material-ui/core';
 
 import {
@@ -21,7 +21,6 @@ import {
     ArcElement,
 } from 'chart.js';
 import { Line, Pie } from 'react-chartjs-2';
-import { Exo, ExoConverter } from '../data/ExoClass';
 import { User, UserConverter } from '../data/UserClass';
 
 
@@ -94,14 +93,7 @@ const ProfilePage: React.FunctionComponent<IPage & RouteComponentProps<any>> = p
 
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
-        if (user) {
-            setAlert({
-                open: true,
-                message: "you must be logged in to access this page",
-                type: "error",
-            });
-        }
-    }, [props])
+    }, [props]);
 
     useEffect(() => {
         async function getdata() {
@@ -123,7 +115,7 @@ const ProfilePage: React.FunctionComponent<IPage & RouteComponentProps<any>> = p
             }
         };
         getdata();
-    }, [user]);
+    }, [user, setAlert]);
 
     const ProfilRender = () => {
         if (userdata) {
@@ -207,8 +199,10 @@ const ProfilePage: React.FunctionComponent<IPage & RouteComponentProps<any>> = p
             )
         }
         else {
-          return  <div>
+            return <div style={{ "textAlign": "center" }}>
                 <Spinner animation="border" />
+                <h1 className='Titre2' >Log in to create personalized sessions!</h1>
+                <Button onClick={() => window.location.href = "/auth/login"}>Log in !</Button>
             </div>
         }
     }

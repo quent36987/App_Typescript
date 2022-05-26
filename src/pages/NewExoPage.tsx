@@ -58,7 +58,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
             name: "rest",
             time: 0,
             type: type,
-            time_inf:false,
+            time_inf: false,
         });
         setItems(i);
         setChange(!change);
@@ -89,7 +89,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
         const handleChangeTimeing = (e, itemId) => {
             const i = items;
             const index = i.findIndex(item => item.id === itemId);
-            i[index].time_inf = ! i[index].time_inf
+            i[index].time_inf = !i[index].time_inf
             handleRLDDChange(i);
             setChange(!change);
         };
@@ -99,47 +99,48 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                 <InputGroup className="mb-3 " >
                     {item.type === 0 ?
                         <FormControl
-                        className='itemexo'
-                        placeholder="Name of Exercise"
-                        type="text"
-                        id={"f" + item.id.toString()}
-                        onClick={(e) => document.getElementById("f" + item.id.toString()).focus()}
-                                                        onChange={(e) => handleChangeName(e, item.id)}
-                        style={{"width":"60%"}}
-                        required
+                            className='itemexo'
+                            placeholder="Name of Exercise"
+                            type="text"
+                            id={"f" + item.id.toString()}
+                            onClick={(e) => document.getElementById("f" + item.id.toString()).focus()}
+                            onChange={(e) => handleChangeName(e, item.id)}
+                            style={{ "width": "60%" }}
+                            required
                         />
                         :
                         <FormControl
-                        className='itemrest'
-                        placeholder="Rest Time"
-                        disabled
-                        type="text"
-                        id={"f" + item.id.toString()}
-                        onClick={(e) => document.getElementById("f" + item.id.toString()).focus()}
-                                                        onChange={(e) => handleChangeName(e, item.id)}
-                        style={{"width":"60%"}}
+                            className='itemrest'
+                            placeholder="Rest Time"
+                            disabled
+                            type="text"
+                            id={"f" + item.id.toString()}
+                            onClick={(e) => document.getElementById("f" + item.id.toString()).focus()}
+                            onChange={(e) => handleChangeName(e, item.id)}
+                            style={{ "width": "60%" }}
                         />
                     }
-                    {type === 4 || type === 3  ? <>
-                         <FormControl   aria-label="Last name"  type='number' placeholder="Time in s"
-                         id={"id2" + item.id.toString()}
-                         onClick={(e) => document.getElementById("id2" + item.id.toString()).focus()}
-                         onChange={(e) => handleChangeTime(e, item.id)}
-                         required={!item.time_inf} 
-                         disabled={item.time_inf}/>
-                         <ToggleButton
-                                 id={"binrf" + item.id.toString()}
-                                 type="checkbox"
-                                 variant="outline-secondary"
-                                 checked={item.time_inf}
-                                 value="1"
-                                 onChange={(e) => { handleChangeTimeing(e,item.id);
-                                 }}
-                             >
-                                 ♾️
-                             </ToggleButton>
-                             </>  : null}
-                   
+                    {type === 4 || type === 3 ? <>
+                        <FormControl aria-label="Last name" type='number' placeholder="Time in s"
+                            id={"id2" + item.id.toString()}
+                            onClick={(e) => document.getElementById("id2" + item.id.toString()).focus()}
+                            onChange={(e) => handleChangeTime(e, item.id)}
+                            required={!item.time_inf}
+                            disabled={item.time_inf} />
+                        <ToggleButton
+                            id={"binrf" + item.id.toString()}
+                            type="checkbox"
+                            variant="outline-secondary"
+                            checked={item.time_inf}
+                            value="1"
+                            onChange={(e) => {
+                                handleChangeTimeing(e, item.id);
+                            }}
+                        >
+                            ♾️
+                        </ToggleButton>
+                    </> : null}
+
                     <Button variant="btn btn-outline-danger" id={"button-addon2" + item.id.toString()}
                         onClick={() => removeItem(item.id)}  >
                         🗑️
@@ -153,7 +154,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
         setItems(reorderedItems);
 
     };
-    
+
 
 
     const sendToFirebase = async () => {
@@ -170,7 +171,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                     exercises.push(exo);
                     time_total += exercices_time;
                     if ((index_exo + 1) * (rest_time + exercices_time) < time_cycle) {
-                        exercises.push({ id: 0, name: "rest", type: 1, time: rest_time,time_inf:false })
+                        exercises.push({ id: 0, name: "rest", type: 1, time: rest_time, time_inf: false })
                         time_total += rest_time;
                     }
                     index_exo++;
@@ -183,7 +184,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                     exercises.push(items[exo]);
                     time_total += items[exo].time;
                     if (exo < lengthItem - 1) {
-                        exercises.push({ id: 0, name: "rest", type: 1, time: rest_time ,time_inf : false})
+                        exercises.push({ id: 0, name: "rest", type: 1, time: rest_time, time_inf: false })
                         time_total += rest_time;
                     }
                 }
@@ -194,10 +195,10 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                 break;
             default:
                 break;
-                
+
         }
         time_total *= cycles;
-        time_total += (cycles-1) * recovery;
+        time_total += (cycles - 1) * recovery;
         //send the message
         const payload = {
             titre: titre,
@@ -209,7 +210,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
             rest_time: rest_time,
             exercises: exercises,
             useruid: user.uid,
-            time_total : time_total,
+            time_total: time_total,
         };
         try {
             if (isPublic) {
@@ -218,7 +219,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
             }
             else {
                 const UserDocRef = doc(db, 'Users', user.uid);
-                await updateDoc(UserDocRef,{exercises : arrayUnion(payload)});
+                await updateDoc(UserDocRef, { exercises: arrayUnion(payload) });
             }
             console.log("addDoc success");
             setAlert({
@@ -243,156 +244,156 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
     return (
         <div className='AuthPage'>
             {user ? <>
-            <h1 className='Titre2' >Create your own tailor-made sports session</h1>
-            <div className="NewExoPage-content">
-                <div className='NewExoPage-content-form' style={{ "maxWidth": "700px" }}>
-                    <Form noValidate validated={validated} onSubmit={handleSubmit}>
-                        <Row className="mb-3">
-                            <Form.Select value={type} onChange={(e) => setType(parseInt(e.target.value))}
-                                aria-label="Default select example"
-                                required
-                            >
-                                {data.map((item, index) => (
-                                    <option key={index} value={item.id}>{item.name}</option>
-                                ))}
-                            </Form.Select>
-                            <Form.Text className="text-muted" >
-                                {data[type].description}
-                            </Form.Text>
-                        </Row>
-                        {type === 0 || type == 2? <></> : <>
+                <h1 className='Titre2' >Create your own tailor-made sports session</h1>
+                <div className="NewExoPage-content">
+                    <div className='NewExoPage-content-form' style={{ "maxWidth": "700px" }}>
+                        <Form noValidate validated={validated} onSubmit={handleSubmit}>
                             <Row className="mb-3">
-                                <Form.Group as={Col} controlId="titreid">
-                                    <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Titre</Form.Label>
-                                    <Form.Control
-                                        size='sm'
-                                        required
-                                        type="text"
-                                        placeholder="session title"
-                                        value={titre}
-                                        onChange={(e) => setTitre(e.target.value)}
-                                    />
-                                </Form.Group>
-                                <Form.Group as={Col} controlId="cycleid">
-                                    <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Cycles</Form.Label>
-                                    <Form.Control
-                                        size='sm'
-                                        required
-                                        type="number"
-                                        placeholder="number of cycles"
-                                        value={cycles !== 0 ? cycles : ""}
-                                        onChange={(e) => setCycles(parseInt(e.target.value))}
-                                    />
-                                </Form.Group>
-                                <Form.Group as={Col} controlId="recoverid">
-                                    <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Recovery Time</Form.Label>
-                                    <Form.Control
-                                        size='sm'
-                                        required
-                                        type="number"
-                                        placeholder="in seconds"
-                                        value={recovery !== 0 ? recovery : ""}
-                                        onChange={(e) => setRecovery(parseInt(e.target.value))}
-                                    />
-                                </Form.Group>
+                                <Form.Select value={type} onChange={(e) => setType(parseInt(e.target.value))}
+                                    aria-label="Default select example"
+                                    required
+                                >
+                                    {data.map((item, index) => (
+                                        <option key={index} value={item.id}>{item.name}</option>
+                                    ))}
+                                </Form.Select>
+                                <Form.Text className="text-muted" >
+                                    {data[type].description}
+                                </Form.Text>
                             </Row>
-
-                            <FloatingLabel controlId="commentid" label="Comments" className="mb-3">
-                                <Form.Control
-                                    as="textarea"
-                                    placeholder="Leave a comment here"
-                                    style={{ height: '90px' }}
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                />
-                            </FloatingLabel>
-                            {type !== 4 ? <>
+                            {type === 0 || type === 2 ? <></> : <>
                                 <Row className="mb-3">
-                                    <Form.Group as={Col} controlId="exotimeid">
-                                        <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Exercise time</Form.Label>
+                                    <Form.Group as={Col} controlId="titreid">
+                                        <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Titre</Form.Label>
                                         <Form.Control
                                             size='sm'
                                             required
-                                            type="number"
-                                            placeholder="in seconds"
-                                            disabled={type === 3}
-                                            value={exercices_time ? exercices_time : ""}
-                                            onChange={(e) => setExercices_time(parseInt(e.target.value))}
+                                            type="text"
+                                            placeholder="session title"
+                                            value={titre}
+                                            onChange={(e) => setTitre(e.target.value)}
                                         />
                                     </Form.Group>
-                                    <Form.Group as={Col} controlId="resttimeid">
-                                        <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Rest Time</Form.Label>
+                                    <Form.Group as={Col} controlId="cycleid">
+                                        <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Cycles</Form.Label>
                                         <Form.Control
                                             size='sm'
                                             required
                                             type="number"
-                                            placeholder="in seconds"
-                                            value={rest_time ? rest_time : ""}
-                                            onChange={(e) => setRest_time(parseInt(e.target.value))}
+                                            placeholder="number of cycles"
+                                            value={cycles !== 0 ? cycles : ""}
+                                            onChange={(e) => setCycles(parseInt(e.target.value))}
                                         />
                                     </Form.Group>
-                                    <Form.Group as={Col} controlId="nbpercycle">
-                                        <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Time of 1 Cycle</Form.Label>
+                                    <Form.Group as={Col} controlId="recoverid">
+                                        <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Recovery Time</Form.Label>
                                         <Form.Control
                                             size='sm'
                                             required
                                             type="number"
                                             placeholder="in seconds"
-                                            disabled={type === 3}
-                                            value={time_cycle ? time_cycle : ""}
-                                            onChange={(e) => setTime_cycle(parseInt(e.target.value))}
+                                            value={recovery !== 0 ? recovery : ""}
+                                            onChange={(e) => setRecovery(parseInt(e.target.value))}
                                         />
                                     </Form.Group>
                                 </Row>
-                            </> : null}
-                            <h1 className='Titre3' >List of exercises : {items.length}</h1>
-                            <div >
-                                <RLDD
-                                    cssClasses=""
-                                    items={items}
-                                    itemRenderer={itemRenderer}
-                                    onChange={handleRLDDChange}
-                                />
-                            </div>
-                            {type === 4 ?
+
+                                <FloatingLabel controlId="commentid" label="Comments" className="mb-3">
+                                    <Form.Control
+                                        as="textarea"
+                                        placeholder="Leave a comment here"
+                                        style={{ height: '90px' }}
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                    />
+                                </FloatingLabel>
+                                {type !== 4 ? <>
+                                    <Row className="mb-3">
+                                        <Form.Group as={Col} controlId="exotimeid">
+                                            <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Exercise time</Form.Label>
+                                            <Form.Control
+                                                size='sm'
+                                                required
+                                                type="number"
+                                                placeholder="in seconds"
+                                                disabled={type === 3}
+                                                value={exercices_time ? exercices_time : ""}
+                                                onChange={(e) => setExercices_time(parseInt(e.target.value))}
+                                            />
+                                        </Form.Group>
+                                        <Form.Group as={Col} controlId="resttimeid">
+                                            <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Rest Time</Form.Label>
+                                            <Form.Control
+                                                size='sm'
+                                                required
+                                                type="number"
+                                                placeholder="in seconds"
+                                                value={rest_time ? rest_time : ""}
+                                                onChange={(e) => setRest_time(parseInt(e.target.value))}
+                                            />
+                                        </Form.Group>
+                                        <Form.Group as={Col} controlId="nbpercycle">
+                                            <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Time of 1 Cycle</Form.Label>
+                                            <Form.Control
+                                                size='sm'
+                                                required
+                                                type="number"
+                                                placeholder="in seconds"
+                                                disabled={type === 3}
+                                                value={time_cycle ? time_cycle : ""}
+                                                onChange={(e) => setTime_cycle(parseInt(e.target.value))}
+                                            />
+                                        </Form.Group>
+                                    </Row>
+                                </> : null}
+                                <h1 className='Titre3' >List of exercises : {items.length}</h1>
+                                <div >
+                                    <RLDD
+                                        cssClasses=""
+                                        items={items}
+                                        itemRenderer={itemRenderer}
+                                        onChange={handleRLDDChange}
+                                    />
+                                </div>
+                                {type === 4 ?
+                                    <div>
+                                        <Button variant="btn btn-outline-secondary" style={{
+                                            "width": "80%",
+                                            "marginBottom": "10px"
+                                        }} onClick={() => addItem(1)}>
+                                            Add Rest
+                                        </Button>
+                                    </div>
+                                    : null}
                                 <div>
                                     <Button variant="btn btn-outline-secondary" style={{
                                         "width": "80%",
-                                        "marginBottom": "10px"
-                                    }} onClick={() => addItem(1)}>
-                                        Add Rest
+                                        "marginBottom": "30px"
+                                    }} onClick={() => addItem(0)}>
+                                        Add Exercise
                                     </Button>
                                 </div>
-                                : null}
-                            <div>
-                                <Button variant="btn btn-outline-secondary" style={{
-                                    "width": "80%",
-                                    "marginBottom": "30px"
-                                }} onClick={() => addItem(0)}>
-                                    Add Exercise
+                                {perm ?
+                                    <Row className="mb-3" style={{ "textAlign": "left", "marginLeft": "20px" }} >
+                                        <Form.Check
+                                            type="switch"
+                                            id="custom-switchpublic"
+                                            label="Session Public"
+                                            onChange={(e) => setIsPublic(e.target.checked)}
+                                        />
+                                    </Row>
+                                    : null}
+                                <Button variant="btn btn-outline-success" type="submit">
+                                    Submit
                                 </Button>
-                            </div>
-                            {perm ?
-                                <Row className="mb-3" style={{ "textAlign": "left", "marginLeft": "20px" }} >
-                                    <Form.Check
-                                        type="switch"
-                                        id="custom-switchpublic"
-                                        label="Session Public"
-                                        onChange={(e) => setIsPublic(e.target.checked)}
-                                    />
-                                </Row>
-                                : null}
-                            <Button variant="btn btn-outline-success" type="submit">
-                                Submit
-                            </Button>
-                        </>}
-                    </Form>
+                            </>}
+                        </Form>
+                    </div>
                 </div>
-            </div>
-            </>: <>
-            <h1 className='Titre2' >Log in to create personalized sessions!</h1>
-            <Button onClick={() => window.location.href = "/auth/login"}>Log in !</Button>
-             </> }
+            </> : <>
+                <h1 className='Titre2' >Log in to create personalized sessions!</h1>
+                <Button onClick={() => window.location.href = "/auth/login"}>Log in !</Button>
+            </>}
         </div>
     )
 

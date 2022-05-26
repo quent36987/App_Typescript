@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+import { Item } from "./ItemType";
 
 export class Exo {
     public cycles: number;
@@ -31,12 +33,12 @@ export class Exo {
     getMoreInfo() {
         return (
             <div>
-                    <h4>Exercices</h4>
-                    <ul>
-                        {this.exercises.map(item => (
-                            <li key={item.id}>{item.name}</li>
-                        ))}
-                    </ul>
+                <h4>Exercices</h4>
+                <ul>
+                    {this.exercises.map(item => (
+                        <li key={item.id}>{item.name}</li>
+                    ))}
+                </ul>
             </div>
         )
     }
@@ -52,6 +54,6 @@ export const ExoConverter = {
         const data = snapshot.data(options);
         return new Exo(data.cycles, data.date, data.description,
             data.exercises, data.recovery_time, data.rest_time,
-            data.time_total, data.titre, data.type, data.useruid,"0");
+            data.time_total, data.titre, data.type, data.useruid, "0");
     }
 };

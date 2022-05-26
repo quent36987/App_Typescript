@@ -21,19 +21,21 @@ const Context = ({ children }) => {
         });
     }, []);
 
-    async function isadm() {
-        if (!user || perm) {
-            return;
-        }
-        const ref = doc(db, "ADM", user.uid);
-        const docSnap = await getDoc(ref);
-        if (docSnap.exists()) {
-            setPerm(docSnap.data().perm);
-        }
-    }
+
+
     useEffect(() => {
+        async function isadm() {
+            if (!user || perm) {
+                return;
+            }
+            const ref = doc(db, "ADM", user.uid);
+            const docSnap = await getDoc(ref);
+            if (docSnap.exists()) {
+                setPerm(docSnap.data().perm);
+            }
+        };
         isadm();
-    },[user]);
+    }, [user, perm]);
 
 
     return (

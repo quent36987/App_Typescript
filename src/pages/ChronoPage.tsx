@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import IPage from '../interfaces/page';
-import logging from '../config/logging';
-import { RouteComponentProps, useParams, withRouter } from 'react-router-dom';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { db } from "../firebase";
 import "./chrono.css";
 import "./allPage.css";
-import { onSnapshot, collection, query, orderBy, doc, getDoc, Timestamp, arrayUnion, updateDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, Timestamp, arrayUnion, updateDoc } from 'firebase/firestore';
 import { AppState } from '../Context';
 import { Exo, ExoConverter } from '../data/ExoClass';
 import { Button, Modal, ProgressBar, Spinner } from 'react-bootstrap';
@@ -42,16 +41,12 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
     const [_cumulatedTime, setCumulatedTime] = useState(0);
     const [_cumulatedTimebefore, setCumulatedTimeBefore] = useState(0);
 
-    const [_exolabel, setExolabel] = useState("");
-
     const [_is_pause, setIsPause] = useState(false);
     const [_is_start, setIsStart] = useState(false);
-    const [_is_end, setIsEnd] = useState(false);
 
     const [startButton, setStartButton] = useState(0);
     const [_progressbarcolor, setProgressbarColor] = useState("danger");
     const [_inter, setIntern] = useState(0);
-    const [change, setChange] = useState(false);
 
     const [show, setShow] = useState(false);
 
@@ -105,48 +100,44 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
             }
         };
         getdata();
-    }, [props, user]);
+    }, [props, user, setAlert]);
 
     useEffect(() => {
-        {
-            if (_time === 0 && _is_start) {
-                window.clearInterval(_inter);
-                setSet(c => c + 1);
-                console.log(_set);
-                setCumulatedTime(_cumulatedTimebefore);
-                if (_set < exo.exercises.length) {
-                    // set the label
-                    setExolabel(exo.exercises[_set].name);
-                    setTime(exo.exercises[_set].time);
-                    setTimming(exo.exercises[_set].time);
-                    setCumulatedTimeBefore(c => c + exo.exercises[_set].time);
-                    setProgressbarColor(exo.exercises[_set].type === 0 ? "danger" : "success");
+        if (_time === 0 && _is_start) {
+            window.clearInterval(_inter);
+            setSet(c => c + 1);
+            console.log(_set);
+            setCumulatedTime(_cumulatedTimebefore);
+            if (_set < exo.exercises.length) {
+                // set the label
+                setTime(exo.exercises[_set].time);
+                setTimming(exo.exercises[_set].time);
+                setCumulatedTimeBefore(c => c + exo.exercises[_set].time);
+                setProgressbarColor(exo.exercises[_set].type === 0 ? "danger" : "success");
 
-                    if (exo.exercises[_set].time_inf) {
-                        setTime(-1);
-                        return;
-                    }
+                if (exo.exercises[_set].time_inf) {
+                    setTime(-1);
+                    return;
                 }
-                else {
-                    if (_cycle + 1 === exo.cycles) {
-                        setIsStart(false);
-                        window.clearInterval(_inter);
-                        setTime(-2);
-                        handleShow();
-                        return;
-                    }
-                    setSet(0);
-                    setExolabel("Recovery");
-                    setProgressbarColor("");
-                    setTime(exo.recovery_time);
-                    setTimming(exo.recovery_time);
-                    setCumulatedTimeBefore(c => c + exo.recovery_time);
-                    setCycle(c => c + 1);
-                }
-                setIntern(window.setInterval(tic, 1000));
             }
+            else {
+                if (_cycle + 1 === exo.cycles) {
+                    setIsStart(false);
+                    window.clearInterval(_inter);
+                    setTime(-2);
+                    handleShow();
+                    return;
+                }
+                setSet(0);
+                setProgressbarColor("");
+                setTime(exo.recovery_time);
+                setTimming(exo.recovery_time);
+                setCumulatedTimeBefore(c => c + exo.recovery_time);
+                setCycle(c => c + 1);
+            }
+            setIntern(window.setInterval(tic, 1000));
         }
-    }, [_time, _is_start]);
+    }, [_time, _is_start, _inter, _cycle, _set, _timming, _cumulatedTime, _cumulatedTimebefore, exo]);
 
 
 

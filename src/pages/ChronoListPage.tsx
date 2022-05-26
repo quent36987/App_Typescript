@@ -5,10 +5,9 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { db } from "../firebase";
 import "./chrono.css";
 import "./allPage.css";
-import { onSnapshot, collection, query, orderBy, doc, getDoc, Timestamp } from 'firebase/firestore';
+import { onSnapshot, collection, query, doc, getDoc } from 'firebase/firestore';
 import { AppState } from '../Context';
-import { Accordion, Button, Card, Col, FloatingLabel, Form, FormControl, Row } from 'react-bootstrap';
-import { Item } from '../data/Item_type';
+import { Accordion, Button, Card, Col, Form, FormControl, Row } from 'react-bootstrap';
 import { data } from '../data/type_exo_data';
 import { User, UserConverter } from '../data/UserClass';
 import { Exo, ExoConverter } from '../data/ExoClass';
@@ -47,10 +46,10 @@ const ChronoListPage: React.FunctionComponent<IPage & RouteComponentProps<any>> 
                     const docc = await getDoc(docRef);
                     setListUser(docc.data());
                     const list: Exo[] = [];
-                    docc.data().exo.forEach((doc: Exo,index) => {
+                    docc.data().exo.forEach((doc: Exo, index) => {
                         list.push(new Exo(doc.cycles, doc.date, doc.description, doc.exercises,
                             doc.recovery_time, doc.rest_time, doc.time_total,
-                            doc.titre, doc.type, doc.useruid,index.toString()));
+                            doc.titre, doc.type, doc.useruid, index.toString()));
                     });
                     setListExoUser(list);
                 } catch (e) {
@@ -73,12 +72,6 @@ const ChronoListPage: React.FunctionComponent<IPage & RouteComponentProps<any>> 
         }
     }, [typetrie, list_exo_public, list_exo_user]);
 
-
-
-    // load the timer (this page + '/' + timer)
-    function loadChronoPage(index: number) {
-        window.location.href = "/chrono/" + (index === 0 ? "" : index.toString());
-    }
 
     function formatTime(time: number) {
         const minutes = Math.floor(time / 60);
