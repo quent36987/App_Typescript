@@ -4,7 +4,7 @@ import HomePage from '../pages/HomePage';
 import ChronoPage from '../pages/ChronoPage';
 import AuthPage from '../pages/AuthPage';
 import ChronoListPage from '../pages/ChronoListPage';
-import ChronoForm from '../pages/ChronoPage';
+import ChronoForm from '../pages/NewExoPage';
 
 const routes: IRoute[] = [
     {

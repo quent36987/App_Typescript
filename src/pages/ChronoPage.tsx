@@ -5,12 +5,12 @@ import { RouteComponentProps, useParams, withRouter } from 'react-router-dom';
 import { db } from "../firebase";
 import "./chrono.css";
 import "./allPage.css";
-import { onSnapshot, collection, query, orderBy, doc, getDoc, Timestamp } from 'firebase/firestore';
+import { onSnapshot, collection, query, orderBy, doc, getDoc, Timestamp, arrayUnion, updateDoc, setDoc } from 'firebase/firestore';
 import { AppState } from '../Context';
 import { Exo, ExoConverter } from './ChronoListPage';
-import { Button, ProgressBar } from 'react-bootstrap';
+import { Button, Modal, ProgressBar, Spinner } from 'react-bootstrap';
 
-const dataButton =[
+const dataButton = [
     {
         id: "0",
         name: "Start",
@@ -24,7 +24,7 @@ const dataButton =[
     {
         id: "2",
         name: "Continue",
-        style : "btn btn-outline-info",
+        style: "btn btn-outline-info",
     }
 
 ]
@@ -52,6 +52,11 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
     const [_inter, setIntern] = useState(0);
     const [change, setChange] = useState(false);
 
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
     const { user, setAlert } = AppState();
 
     useEffect(() => {
@@ -78,7 +83,7 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
         {
             if (_time === 0 && _is_start) {
                 window.clearInterval(_inter);
-                setSet(c => c + 1); 
+                setSet(c => c + 1);
                 console.log(_set);
                 setCumulatedTime(_cumulatedTimebefore);
                 if (_set < exo.exercises.length) {
@@ -94,24 +99,23 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                         return;
                     }
                 }
-                else{
+                else {
+                    if (_cycle +1  === exo.cycles) {
+                        setIsStart(false);
+                        window.clearInterval(_inter);
+                        setTime(-2);
+                        handleShow();
+                        return;
+                    }
                     setSet(0);
                     setExolabel("Recovery");
                     setProgressbarColor("");
-                    setCycle(cycle => cycle + 1);
                     setTime(exo.recovery_time);
                     setTimming(exo.recovery_time);
-                    setCumulatedTimeBefore(c => c + exo.recovery_time);
+                    setCumulatedTimeBefore(c => c + exo.recovery_time); 
+                    setCycle(c => c+1);
                 }
-               
-                if (_cycle === exo.cycles)
-                {
-                    setIsStart(false);
-                    return;
-                }
-                else{
-                    setIntern(window.setInterval(tic, 1000));
-                } 
+                setIntern(window.setInterval(tic, 1000));
             }
         }
     }, [_time, _is_start]);
@@ -125,9 +129,8 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                 return pause;
             } else {
                 setTime(time => {
-                    if (time === 0)
-                    {
-                        setIntern(c =>  { console.log(c);window.clearInterval(c); return c});
+                    if (time === 0) {
+                        setIntern(c => { console.log(c); window.clearInterval(c); return c });
                         return 0;
                     }
                     setCumulatedTime(c => c + 1);
@@ -137,10 +140,9 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
             }
         });
     }
-   
 
-    function play()
-    {
+
+    function play() {
         switch (startButton) {
             case 0:
                 setIsStart(true);
@@ -158,17 +160,18 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                 break;
         }
     }
-    function suivant()
-    {
+    function suivant() {
         setTime(0);
         setIsPause(false);
         setStartButton(1);
     }
 
     function formatTime(time: number) {
-        if (time === -1)
-        {
+        if (time === -1) {
             return "♾";
+        }
+        if (time === -2) {
+            return "Finished !"
         }
         const minutes = Math.floor(time / 60);
         let seconds = time % 60;
@@ -177,42 +180,75 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
         }
         return `${minutes}:${seconds}`;
     }
+    async function saveChange() {
+        console.log("eee");
+        if (user) {
+            const UserDocRef = doc(db, 'Users', user.uid);
+            const payload = { exo_log: arrayUnion({id:props.match.params.exoId, time: exo.time_total, date:Timestamp.now()}) };
+            try {
+                await updateDoc(UserDocRef, payload);
+            }
+            catch (error) {
+                console.log(error);
+            }
+        }
+        else {
+
+        }
+        handleClose();
+    };
 
 
     const Render = () => {
         if (exo) {
             return (
                 <div className="chrono-page">
+                    <Modal show={show} onHide={handleClose}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Session finished !</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>Woohoo, do you want to record this session? This will allow you to follow your training</Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={handleClose}>
+                                Close
+                            </Button>
+                            <Button variant="primary" onClick={saveChange}>
+                                Save Changes
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
                     <div className="timer" >
                         <h1 className='Titre2' style={{ "textAlign": "center", "marginBottom": "1vh", "marginTop": "2vh" }} >{exo.titre}</h1>
-                        <div className="session" style={{"display":"flex","justifyContent":"center","paddingBottom":"1vh"}}>
+                        <div className="session" style={{ "display": "flex", "justifyContent": "center", "paddingBottom": "1vh" }}>
                             <div className="breakCtrl">
-                                <p style={{"position":"relative","top":"30%"}}>Sets</p>
-                                <span style={{"paddingTop":"0px"}} className="time" id="sets">{_set}/{exo.exercises.length}</span>
+                                <p style={{ "position": "relative", "top": "30%" }}>Sets</p>
+                                <span style={{ "paddingTop": "0px" }} className="time" id="sets">{_set}/{exo.exercises.length}</span>
                             </div>
                             <div className="sessionCtrl">
-                            <p style={{"position":"relative","top":"30%"}}>Cycles</p>
-                                <span style={{"paddingTop":"0px"}} className="time" id="sets">{_cycle}/{exo.cycles}</span>
+                                <p style={{ "position": "relative", "top": "30%" }}>Cycles</p>
+                                <span style={{ "paddingTop": "0px" }} className="time" id="sets">{_cycle}/{exo.cycles}</span>
                             </div>
                         </div>
                         <div>
-                        <span id="base-timer-label" className="base-timer__label">{formatTime(_time)}</span>
-                        <span id="base-timer-label2" className="base-timer__label2">{formatTime(_cumulatedTime)}</span>
+                            <span id="base-timer-label" className="base-timer__label">{formatTime(_time)}</span>
+                            <span id="base-timer-label2" className="base-timer__label2">{formatTime(_cumulatedTime)}</span>
                         </div>
-                            <ProgressBar style={{"marginBottom":"1vh"}} animated striped variant={_progressbarcolor} 
-                            now={(_time /  _timming)*100} />
-                            <ProgressBar style={{"marginBottom":"1vh"}} animated striped variant="info" 
-                            now={(_cumulatedTime / exo.time_total)*100} />
+                        <ProgressBar style={{ "marginBottom": "1vh" }} animated striped variant={_progressbarcolor}
+                            now={(_time / _timming) * 100} />
+                        <ProgressBar style={{ "marginBottom": "1vh" }} animated striped variant="info"
+                            now={(_cumulatedTime / exo.time_total) * 100} />
 
                         <div className='contenaireit'>
-                            <div className='it2'>{_set > 0 && _set <= exo.exercises.length ? exo.exercises[_set-1].name : "Recovery"}</div>
+                            <div className='it2'>{_set > 0 && _set <= exo.exercises.length ? exo.exercises[_set - 1].name : "Recovery"}</div>
                             <div className='it3'>{_set >= 0 && _set < exo.exercises.length ? exo.exercises[_set].name : "Recovery"}</div>
                         </div>
 
                         <div>
-                            <Button variant={dataButton[startButton].style} style={{"margin":"1vw"}} onClick={play} >
+                            <Button variant={dataButton[startButton].style} style={{ "margin": "1vw" }} onClick={play} >
                                 {dataButton[startButton].name}</Button>
-                            <Button variant='btn btn-outline-primary' style={{"margin":"1vw"}} onClick={suivant} >Suivant</Button>
+                            <Button variant='btn btn-outline-primary' style={{ "margin": "1vw" }}
+                                onClick={suivant}
+                                disabled={startButton === 0}>Next</Button>
                         </div>
                     </div>
                 </div>
@@ -221,7 +257,7 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
         else {
             return (
                 <div>
-                    <h1>Loading</h1>
+                    <Spinner animation="border" />
                 </div>
             );
         }
