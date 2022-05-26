@@ -5,26 +5,84 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import Timer from '../componants/timer';
 import { db } from "../firebase";
 import "./chrono.css";
+import "./allPage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock } from "@fortawesome/free-solid-svg-icons";
-import { onSnapshot, collection, query, orderBy, doc, getDoc } from 'firebase/firestore';
+import { onSnapshot, collection, query, orderBy, doc, getDoc, Timestamp } from 'firebase/firestore';
 import { AppState } from '../Context';
+import { Accordion, Button, Card } from 'react-bootstrap';
+import { Item } from '../data/Item_type';
+import { data } from '../data/type_exo_data';
+
+
+class Exo {
+    public cycles: number;
+    public date: Timestamp;
+    public description: string;
+    public exercises: Item[] = [];
+    public recovery_time: number;
+    public rest_time: number;
+    public time_total: number;
+    public titre: string;
+    public type: number;
+    public useruid: number;
+    public id : string;
+
+    constructor(cycles: number, date: Timestamp, description: string, exercises: Item[],
+        recovery_time: number, rest_time: number, time_total: number,
+        titre: string, type: number, useruid: number) {
+        this.cycles = cycles;
+        this.date = date;
+        this.description = description;
+        this.exercises = exercises;
+        this.recovery_time = recovery_time;
+        this.rest_time = rest_time;
+        this.time_total = time_total;
+        this.titre = titre;
+        this.type = type;
+        this.useruid = useruid;
+    }
+}
+
+
+const ExoConverter = {
+    toFirestore: (a) => {
+        return {
+        };
+    },
+    fromFirestore: (snapshot, options) => {
+        const data = snapshot.data(options);
+        return new Exo(data.cycles, data.date, data.description,
+            data.exercises, data.recovery_time, data.rest_time,
+            data.time_total, data.titre, data.type, data.useruid);
+    }
+};
+
 
 
 
 const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = props => {
-    const [list, setList] = useState([]);
+    const [trie, setTrie ]= useState("");
     const [list_user, setListUser] = useState([]);
+    const [list_exo,setListExo] = useState<Exo[]>([]);
     const { user } = AppState();
 
 
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
-        const collectionRef = collection(db, "exercices");
-        const q = query(collectionRef, orderBy("name", "desc"));
-        onSnapshot(q, (snapshot) => {
-            setList(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+        const collectionRef = collection(db, "exercises").withConverter<Exo>(ExoConverter);
+        const queryRef = query(collectionRef);
+        onSnapshot(queryRef, (snapshot) => {
+            const list_exos: Exo[] = [];
+            snapshot.forEach((doc) => {
+                const exo = doc.data();
+                exo.id = doc.id;
+                list_exos.push(exo);
+            });
+            setListExo(list_exos);
+            console.log("akout");
         });
+        console.log(queryRef);
     }, [props])
 
 
@@ -63,40 +121,43 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
 
     // return list with all exo or a timer of one exo
     function PageRender() {
-
+        console.log("exo :",list_exo);
+        
         let number = props.match.params.number;
-        if (!number || number > list.length) {
-            return <div className="scroll">
-                <button className='buttonback' onClick={() => { window.location.href = "/" }}>BACK</button>
-                <h1 className='h1time' >Liste des exercices</h1>
+        if (!number) {
+            return <div>
+                <h1 className='Titre2' style={{ "textAlign": "center" }} >dssff</h1>
                 <div className="courselist">
-                    {list.map((day, key) =>
-                        <div className="course" onClick={() => loadChronoPage(key + 1)} key={key}>
-                            <div className="course-preview">
-                                <h2 className='h22'>{day.name}</h2>
-                                <h6 className='h6'>{day.type}</h6>
-                            </div>
-
-                            <div className="course-info">
-                                <div className="progress-container">
-                                    <FontAwesomeIcon icon={faClock} />
-                                    <span className="progress-text">
-                                       
-                                    </span>
-                                </div>
-                                <h6>Description</h6>
-                                {list_user.find(e => e.exo === day.id) !== undefined ?
-                                    <h6 className='h6'>Vous avez déjà effectué cet exercice</h6> :
-                                    <h6 className='h6'>Vous n'avez pas encore effectué cet exercice</h6>}
-                                <h2 className='desc'>{day.description}</h2>
-                            </div>
-                        </div>
-                    )}
+                    {list_exo.map((exo, index) => { 
+                       return <Card style={{ "margin": "10px" }}>
+                            <Card.Header>{exo.titre}</Card.Header>
+                            <Card.Body>
+                                <Card.Title>Special title treatment</Card.Title>
+                                <Card.Text>
+                                    With supporting text below as a natural lead-in to additional content.
+                                </Card.Text>
+                                <Button variant="primary">Go somewhere</Button>
+                                <Accordion style={{ "margin": "10px" }} >
+                                    <Accordion.Item eventKey="0">
+                                        <Accordion.Header style={{ "fontSize": "5px", "padding": "0px" }}>more info ?</Accordion.Header>
+                                        <Accordion.Body>
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+                                            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                                            commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+                                            velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+                                            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
+                                            est laborum.
+                                        </Accordion.Body>
+                                    </Accordion.Item>
+                                </Accordion>
+                            </Card.Body>
+                        </Card> })}
                 </div>
             </div>
         }
         else {
-            return <div>
+           /* return <div>
                 <button className='buttonback' onClick={() => loadChronoPage(0)}>BACK</button>
                 <Timer exercises_time={list[number - 1].exercises_time}
                     rest_time={list[number - 1].rest_time}
@@ -108,7 +169,7 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                     exercises_info={list[number - 1].exercises_info}
                     pyramide={list[number - 1].pyramide}
                     exercise_id={list[number - 1].id} />
-            </div>
+            </div>*/
         }
 
     }

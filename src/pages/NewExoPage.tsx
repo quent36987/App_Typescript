@@ -7,43 +7,11 @@ import './allPage.css';
 import { addDoc, arrayUnion, collection, doc, Timestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { AppState } from '../Context';
+import { Item } from '../data/Item_type';
+import { data } from '../data/type_exo_data';
 
 
 
-type Item = {
-    id: number;
-    name: string;
-    time: number;
-    type: number; //0 exo  1 rest
-    time_inf:boolean;
-}
-const data = [
-    {
-        id: 0,
-        name: "Select the seance mode you want",
-        description: "This saves time to create the series of exercises",
-    },
-    {
-        id: 1,
-        name: "Tabata",
-        description: "A tabata is a cardio session where you do different exercises with the same time",
-    },
-    {
-        id: 2,
-        name: "Pyramide",
-        description: "Not implemented yet",
-    },
-    {
-        id: 3,
-        name: "Serie Exo",
-        description: "Simple serie of differents exercises",
-    },
-    {
-        id: 4,
-        name: "Full Custom",
-        description: "Full Custom session, you can add exercises with time or not and rest or not bewteen exercises",
-    },
-]
 
 
 const ChronoForm: React.FunctionComponent<IPage> = props => {
