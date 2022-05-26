@@ -51,16 +51,15 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
     };
 
     const addItem = (type: number) => {
-        console.log("addItem");
         const i = items;
         i.push({
-            id: i.length === 0 ? 0 : i.sort((a, b) => a.id - b.id)[i.length - 1].id + 1,
+            id: items.length === 0 ? 0 : items.sort((a, b) => a.id - b.id)[items.length - 1].id + 1,
             name: "rest",
             time: 0,
             type: type,
             time_inf: false,
         });
-        setItems(i);
+        handleRLDDChange(i);
         setChange(!change);
     };
 
@@ -152,7 +151,6 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
 
     const handleRLDDChange = (reorderedItems: Array<Item>) => {
         setItems(reorderedItems);
-
     };
 
 

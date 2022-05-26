@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { auth } from "./../firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "./../firebase";
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { AppState } from "../Context";
 import { Button, Form } from "react-bootstrap";
 import { Link } from "@material-ui/core";
+import GoogleButton from "react-google-button";
+import { doc, setDoc, Timestamp } from "firebase/firestore";
 
 
 
@@ -11,6 +13,49 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { setAlert } = AppState();
+
+  const googleProvider = new GoogleAuthProvider();
+  const signInWithGoogle = async() => {
+    signInWithPopup(auth, googleProvider)
+      .then((res) => {
+        setAlert({
+          open: true,
+          message: `Sign Up Successful. Welcome ${res.user.email}`,
+          type: "success",
+        });
+        try {
+            setDoc(doc(db, "Users", res.user.uid), {
+            firstName: res.user.displayName,
+            lastName: "",
+            genre: "",
+            date_inscription: Timestamp.now(),
+          });
+          console.log(res.user.uid);
+          setAlert({
+            open: true,
+            message: `Sign Up Successful. Welcome ${res.user.email}`,
+            type: "success",
+          });
+          window.location.href = "/";
+        }
+        catch (error) {
+          console.log(error);
+          setAlert({
+            open: true,
+            type: "error",
+            message: "Error on creating user"
+          });
+        }
+      })
+      .catch((error) => {
+        setAlert({
+          open: true,
+          message: error.message,
+          type: "error",
+        });
+        return;
+      });
+  };
 
 
   const handleSubmit = async () => {
@@ -46,7 +91,7 @@ const Login = () => {
 
 
   return (
-
+    <>
     <Form>
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label >Email address</Form.Label>
@@ -73,6 +118,13 @@ const Login = () => {
         Submit
       </Button>
     </Form>
+    <p style={{ "marginTop": "10px" }}>OR</p>
+    <GoogleButton
+
+      style={{ width: "100%", outline: "none", "margin": "10px" }}
+      onClick={signInWithGoogle}
+    />
+    </>
   );
 };
 

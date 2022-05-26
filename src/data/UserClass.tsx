@@ -18,21 +18,32 @@ export class User {
         this.date_inscription = date_inscription;
         this.temps_tt = 0;
         this.genre = genre;
+        if (exo) {
         exo.forEach(e => {
             this.exo.push(new Exo(e.cycles,e.date,e.description,e.exercises,e.recovery_time,e.rest_time,e.time_total,e.titre
                 ,e.type,e.useruid,e.id));
         }); 
+        }
+        else
+        {
+            this.exo = [];
+        }
         this.last_exo_date = null;
         //search the early date of the list exo
+        if (this.exo_log){
         this.exo_log.forEach(e => {
             if (e.date < this.last_exo_date || this.last_exo_date == null) {
                 this.last_exo_date = e.date;
             }
-        });
-        //calculate the total time
-        this.exo_log.forEach(e => {
             this.temps_tt += e.time;
         });
+        }
+        else
+        {
+            this.exo_log = [];
+        }
+        //calculate the total time
+        
         this.exo = exo;
         this.genre = genre;
     }

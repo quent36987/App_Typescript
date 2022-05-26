@@ -1,11 +1,12 @@
 
 import { useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword} from "firebase/auth";
 import { auth, db } from "../firebase";
 import { AppState } from "../Context";
 import { doc, setDoc, Timestamp } from "firebase/firestore";
 import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { Link } from "@material-ui/core";
+
 
 
 const Signup = () => {
@@ -16,6 +17,7 @@ const Signup = () => {
   const [lastName, setLastName] = useState("");
   const [genre, setGenre] = useState("");
   const { setAlert } = AppState();
+
 
   async function add() {
     try {
@@ -70,13 +72,13 @@ const Signup = () => {
     console.log(genre);
   };
 
-  return (
+  return (<>
     <Form noValidate validated={validated} onSubmit={handleSubmit}>
       <Row className="mb-3">
         <Form.Group as={Col} md="4" controlId="validationCustom0"  >
           <Form.Label>Genre</Form.Label>
           <Form.Select aria-label="" value={genre}
-            onChange={(e) => {setGenre(e.target.value)}}
+            onChange={(e) => { setGenre(e.target.value) }}
             required
           >
             <option value="no">Select</option>
@@ -149,13 +151,14 @@ const Signup = () => {
           </InputGroup>
         </Form.Group>
         <Form.Text id="passwordHelpBlock" muted>
-    Your password must be 8-20 characters long, contain letters and numbers, and
-    must not contain spaces, special characters, or emoji.
-  </Form.Text>
+          Your password must be 8-20 characters long, contain letters and numbers, and
+          must not contain spaces, special characters, or emoji.
+        </Form.Text>
       </Row>
       <p>already have an account ? <Link href="/auth/login" >Log in here !</Link></p>
       <Button variant="primary" type="submit">Register</Button>
     </Form>
+  </>
   );
 }
 

@@ -153,11 +153,11 @@ const ProfilePage: React.FunctionComponent<IPage & RouteComponentProps<any>> = p
                                 </div>
                                 <div className='div-Profile-info-item'>
                                     <span className='titreitem'>Date inscription</span>
-                                    <span className='valeuritem'> {userdata.date_inscription !== undefined ? userdata.date_inscription.toDate().toDateString() : null} </span>
+                                    <span className='valeuritem'> {userdata.date_inscription !==null ? userdata.date_inscription.toDate().toDateString() : null} </span>
                                 </div>
                                 <div className='div-Profile-info-item'>
                                     <span className='titreitem'>Dernier séance faite</span>
-                                    <span className='valeuritem'> {!userdata.last_exo_date !== undefined ? userdata.last_exo_date.toDate().toDateString() : null} </span>
+                                    <span className='valeuritem'> {userdata.last_exo_date !==null ? userdata.last_exo_date.toDate().toDateString() : null} </span>
                                 </div>
                                 <div className='div-Profile-info-item'>
                                     <span className='titreitem'>Temps total</span>
