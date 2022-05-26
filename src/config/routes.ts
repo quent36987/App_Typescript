@@ -1,9 +1,10 @@
 import IRoute from '../interfaces/route';
 import ProfilePage from '../pages/ProfilePage';
 import HomePage from '../pages/HomePage';
-import ChronoPage from '../pages/ExoPage';
-import ChronoForm from '../pages/NewExoPage';
+import ChronoPage from '../pages/ChronoPage';
 import AuthPage from '../pages/AuthPage';
+import ChronoListPage from '../pages/ChronoListPage';
+import ChronoForm from '../pages/ChronoPage';
 
 const routes: IRoute[] = [
     {
@@ -20,12 +21,12 @@ const routes: IRoute[] = [
     },
     {
         path: '/chrono',
-        name: 'Chrono Page',
-        component: ChronoPage,
+        name: 'Chrono List Page',
+        component: ChronoListPage,
         exact: true
     },
     {
-        path: '/chrono/:number',
+        path: '/chrono/:exoId',
         name: 'Chrono Page',
         component: ChronoPage,
         exact: true
