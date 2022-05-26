@@ -7,10 +7,8 @@ import './allPage.css';
 import { addDoc, arrayUnion, collection, doc, Timestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { AppState } from '../Context';
-import { Item } from '../data/Item_type';
+import { Item } from '../data/ItemType';
 import { data } from '../data/type_exo_data';
-
-
 
 
 

@@ -7,9 +7,9 @@ import "./chrono.css";
 import "./allPage.css";
 import { onSnapshot, collection, query, orderBy, doc, getDoc, Timestamp, arrayUnion, updateDoc, setDoc } from 'firebase/firestore';
 import { AppState } from '../Context';
-import { Exo, ExoConverter } from './ChronoListPage';
+import { Exo, ExoConverter } from '../data/ExoClass';
 import { Button, Modal, ProgressBar, Spinner } from 'react-bootstrap';
-import { User, UserConverter } from './ProfilePage';
+import { User, UserConverter } from '../data/UserClass';
 
 const dataButton = [
     {

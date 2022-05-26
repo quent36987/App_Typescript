@@ -3,7 +3,7 @@ import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { AppState } from "../Context";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, Timestamp } from "firebase/firestore";
 import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { Link } from "@material-ui/core";
 
@@ -30,7 +30,7 @@ const Signup = () => {
           firstName: firstName,
           lastName: lastName,
           genre: genre,
-          date_inscription: Date.now(),
+          date_inscription: Timestamp.now(),
         });
         setAlert({
           open: true,
