@@ -154,7 +154,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                         style={{"width":"60%"}}
                         />
                     }
-                    {type === 4  ? <>
+                    {type === 4 || type === 3  ? <>
                          <FormControl   aria-label="Last name"  type='number' placeholder="Time in s"
                          id={"id2" + item.id.toString()}
                          onClick={(e) => document.getElementById("id2" + item.id.toString()).focus()}
@@ -187,13 +187,14 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
         setItems(reorderedItems);
 
     };
-
+    
 
 
     const sendToFirebase = async () => {
         // calculate the exercises 
         var exercises: Item[] = [];
         var lengthItem = items.length;
+        var time_total = 0;
         let index_exo = 0;
         switch (type) {
             case 1:  // Tabata = > exo + rest... (time of cycle tabata)
@@ -201,31 +202,36 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                     var exo = items[index_exo % lengthItem];
                     exo.time = exercices_time;
                     exercises.push(exo);
+                    time_total += exercices_time;
                     if ((index_exo + 1) * (rest_time + exercices_time) < time_cycle) {
                         exercises.push({ id: 0, name: "rest", type: 1, time: rest_time,time_inf:false })
+                        time_total += rest_time;
                     }
                     index_exo++;
                 }
-
                 break;
             case 2: //Pyramide all cycle we change the 
-
                 break;
             case 3: // Serie Exo (add rest time beteewn exo)
                 for (let exo = 0; exo < lengthItem; exo++) {
                     exercises.push(items[exo]);
+                    time_total += items[exo].time;
                     if (exo < lengthItem - 1) {
                         exercises.push({ id: 0, name: "rest", type: 1, time: rest_time ,time_inf : false})
+                        time_total += rest_time;
                     }
                 }
                 break;
             case 4:  // Full Custom
                 exercises = items;
+                time_total += items.reduce((acc, cur) => acc + cur.time, 0);
                 break;
             default:
                 break;
+                
         }
-
+        time_total *= cycles;
+        time_total += (cycles-1) * recovery;
         //send the message
         const payload = {
             titre: titre,
@@ -237,6 +243,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
             rest_time: rest_time,
             exercises: exercises,
             useruid: user.uid,
+            time_total : time_total,
         };
         try {
             if (isPublic) {
