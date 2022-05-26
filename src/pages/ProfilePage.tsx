@@ -21,6 +21,7 @@ import {
   ArcElement,
 } from 'chart.js';
 import { Line, Pie } from 'react-chartjs-2';
+import { Exo } from './ChronoListPage';
 
 
 ChartJS.register(
@@ -84,40 +85,30 @@ const data = {
   };
 
 
-class User {
+export class User {
     public firstName: string;
     public lastName : string;
     public genre: string;
     public date_inscription: Timestamp;
-
     public last_exo_date: Timestamp;
     public temps_tt: number;
+    public exo_log = [];
+    public exo: Exo[] =[];
 
-    public exo: {date : Timestamp, exo : string, time : number}[];
-    constructor(firstName,lastName, exo,date_inscription) {
+    constructor(firstName,lastName, exo_log,date_inscription,exo : Exo[],genre) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.exo = exo;
+        this.exo_log = exo_log;
         this.date_inscription = date_inscription;
         this.last_exo_date = Timestamp.now();
         this.temps_tt = 0;
         this.genre = "";
-
-        if (this.exo && this.exo.length > 0) {
-            this.temps_tt = 0;
-            var max = this.exo[0].date.seconds;
-            for (let i = 0; i < this.exo.length; i++) {
-                 this.temps_tt += this.exo[i].time;
-                if (this.exo[i].date.seconds >  max) {
-                    max = this.exo[i].date.seconds;
-                }
-         }
-          this.last_exo_date = new Timestamp(max,0);
-        }
+        this.exo = exo;
+        this.genre = genre;
     }  
 }
 
-const UserConverter = {
+export const UserConverter = {
     toFirestore: (user) => {
         return {
             firstName: user.firstName,
@@ -128,7 +119,7 @@ const UserConverter = {
     },
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options);
-        return new User(data.firstName,data.lastName , data.exo_log, data.date_inscription);
+        return new User(data.firstName,data.lastName , data.exo_log, data.date_inscription,data.exercises,data.genre);
     }
 };
 
@@ -136,7 +127,7 @@ const UserConverter = {
 const ProfilePage: React.FunctionComponent<IPage & RouteComponentProps<any>> = props => {
 
     const { user, setAlert } = AppState();
-    const [userdata , setUserdata] = useState(new User("","",null,new Timestamp(0,0)));
+    const [userdata , setUserdata] = useState<User>(null);
 
     useEffect(() => {
         logging.info(`Loading ${props.name}`);

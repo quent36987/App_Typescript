@@ -9,6 +9,7 @@ import { onSnapshot, collection, query, orderBy, doc, getDoc, Timestamp, arrayUn
 import { AppState } from '../Context';
 import { Exo, ExoConverter } from './ChronoListPage';
 import { Button, Modal, ProgressBar, Spinner } from 'react-bootstrap';
+import { User, UserConverter } from './ProfilePage';
 
 const dataButton = [
     {
@@ -61,23 +62,50 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
 
     useEffect(() => {
         async function getdata() {
-            if (user && props.match.params.exoId) {
+            if (props.match.params.exoId) {
                 console.log("id" + props.match.params.exoId);
                 const ref = doc(db, "exercises", props.match.params.exoId).withConverter(ExoConverter);
                 const docSnap = await getDoc(ref);
                 if (docSnap.exists()) {
                     setExo(docSnap.data());
                 } else {
-                    setAlert({
-                        open: true,
-                        message: "exercises doesnt exist ?!",
-                        type: "error",
-                    });
+                    if (user) {
+                        const docRef = doc(db, "Users", user.uid).withConverter<User>(UserConverter);
+                        try {
+                            const docc = await getDoc(docRef);
+                            if (docc.exists() && docc.data().exo.length > parseInt(props.match.params.exoId)) {
+                                var val = docc.data().exo[parseInt(props.match.params.exoId)];
+                                setExo(new Exo(val.cycles, val.date, val.description, val.exercises,
+                                    val.recovery_time, val.rest_time, val.time_total,
+                                    val.titre, val.type, val.useruid, props.match.params.exoId));
+                            }
+                        } catch (e) {
+                            console.log("Error getting cached document:", e);
+                            setAlert({
+                                open: true,
+                                message: "Error getting cached document",
+                                type: "error",
+                            });
+
+                        }
+                        setAlert({
+                            open: false,
+                            message: "exercises doesnt exist ?!",
+                            type: "success",
+                        });
+                    }
+                    else {
+                        setAlert({
+                            open: true,
+                            message: "exercises doesnt exist ?!",
+                            type: "error",
+                        });
+                    }
                 }
             }
         };
         getdata();
-    }, [user]);
+    }, [props, user]);
 
     useEffect(() => {
         {
@@ -100,7 +128,7 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                     }
                 }
                 else {
-                    if (_cycle +1  === exo.cycles) {
+                    if (_cycle + 1 === exo.cycles) {
                         setIsStart(false);
                         window.clearInterval(_inter);
                         setTime(-2);
@@ -112,8 +140,8 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                     setProgressbarColor("");
                     setTime(exo.recovery_time);
                     setTimming(exo.recovery_time);
-                    setCumulatedTimeBefore(c => c + exo.recovery_time); 
-                    setCycle(c => c+1);
+                    setCumulatedTimeBefore(c => c + exo.recovery_time);
+                    setCycle(c => c + 1);
                 }
                 setIntern(window.setInterval(tic, 1000));
             }
@@ -184,7 +212,7 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
         console.log("eee");
         if (user) {
             const UserDocRef = doc(db, 'Users', user.uid);
-            const payload = { exo_log: arrayUnion({id:props.match.params.exoId, time: exo.time_total, date:Timestamp.now()}) };
+            const payload = { exo_log: arrayUnion({ id: props.match.params.exoId, time: exo.time_total, date: Timestamp.now() }) };
             try {
                 await updateDoc(UserDocRef, payload);
             }

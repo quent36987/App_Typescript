@@ -10,6 +10,7 @@ import { AppState } from '../Context';
 import { Accordion, Button, Card, Col, FloatingLabel, Form, FormControl, Row } from 'react-bootstrap';
 import { Item } from '../data/Item_type';
 import { data } from '../data/type_exo_data';
+import { User, UserConverter } from './ProfilePage';
 
 
 
@@ -28,7 +29,7 @@ export class Exo {
 
     constructor(cycles: number, date: Timestamp, description: string, exercises: Item[],
         recovery_time: number, rest_time: number, time_total: number,
-        titre: string, type: number, useruid: number) {
+        titre: string, type: number, useruid: number, id: string) {
         this.cycles = cycles;
         this.date = date;
         this.description = description;
@@ -39,23 +40,18 @@ export class Exo {
         this.titre = titre;
         this.type = type;
         this.useruid = useruid;
+        this.id = id;
     }
 
     getMoreInfo() {
         return (
             <div>
-                <div>
-                    <h3>{this.titre}</h3>
-                    <p>{this.description}</p>
-                </div>
-                <div>
                     <h4>Exercices</h4>
                     <ul>
                         {this.exercises.map(item => (
                             <li key={item.id}>{item.name}</li>
                         ))}
                     </ul>
-                </div>
             </div>
         )
     }
@@ -71,13 +67,16 @@ export const ExoConverter = {
         const data = snapshot.data(options);
         return new Exo(data.cycles, data.date, data.description,
             data.exercises, data.recovery_time, data.rest_time,
-            data.time_total, data.titre, data.type, data.useruid);
+            data.time_total, data.titre, data.type, data.useruid,"0");
     }
 };
 
 const ChronoListPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = props => {
     const [trie, setTrie] = useState("");
-    const [list_user, setListUser] = useState([]);
+    const [typetrie, setTypeTrie] = useState("0");
+    const [user_info, setListUser] = useState<User>(null);
+    const [list_exo_public, setListExoPublic] = useState<Exo[]>([]);
+    const [list_exo_user, setListExoUser] = useState<Exo[]>([]);
     const [list_exo, setListExo] = useState<Exo[]>([]);
     const { user } = AppState();
 
@@ -92,21 +91,23 @@ const ChronoListPage: React.FunctionComponent<IPage & RouteComponentProps<any>> 
                 exo.id = doc.id;
                 list_exos.push(exo);
             });
-            setListExo(list_exos);
-            console.log("akout");
+            setListExoPublic(list_exos);
         });
-        console.log(queryRef);
     }, [props])
-
-
     useEffect(() => {
         async function getUserData() {
             if (user) {
-                const docRef = doc(db, "Users", user.uid);
+                const docRef = doc(db, "Users", user.uid).withConverter<User>(UserConverter);
                 try {
                     const docc = await getDoc(docRef);
-                    setListUser(docc.data().exo_log);
-                    console.log("data");
+                    setListUser(docc.data());
+                    const list: Exo[] = [];
+                    docc.data().exo.forEach((doc: Exo,index) => {
+                        list.push(new Exo(doc.cycles, doc.date, doc.description, doc.exercises,
+                            doc.recovery_time, doc.rest_time, doc.time_total,
+                            doc.titre, doc.type, doc.useruid,index.toString()));
+                    });
+                    setListExoUser(list);
                 } catch (e) {
 
                     console.log("Error getting cached document:", e);
@@ -114,7 +115,19 @@ const ChronoListPage: React.FunctionComponent<IPage & RouteComponentProps<any>> 
             }
         };
         getUserData();
-    }, [props]);
+    }, [user]);
+
+    useEffect(() => {
+        if (typetrie === "0") {
+            setListExo(list_exo_public.concat(list_exo_user));
+
+        } else if (typetrie === "1") {
+            setListExo(list_exo_user);
+        } else {
+            setListExo(list_exo_public);
+        }
+    }, [typetrie, list_exo_public, list_exo_user]);
+
 
 
     // load the timer (this page + '/' + timer)
@@ -133,53 +146,54 @@ const ChronoListPage: React.FunctionComponent<IPage & RouteComponentProps<any>> 
 
     // return list with all exo or a timer of one exo
     function PageRender() {
-            return  <div className="courselist">
-                    <Row xs={1} md={2} className="g-0">
-                        {list_exo.filter(exo => {
-                            if (trie === "") {
-                                return true;
-                            }
-                            else{
-                                return exo.titre.toLowerCase().includes(trie.toLowerCase())
-                            }}).map((exo, index) => {
+        return <div className="courselist">
+            <Row xs={1} md={2} className="g-0">
+                {list_exo.filter(exo => {
+                    if (trie === "") {
+                        return true;
+                    }
+                    else {
+                        return exo.titre.toLowerCase().includes(trie.toLowerCase())
+                    }
+                }).map((exo, index) => {
 
-                            return <Col>
-                                <Card style={{ "margin": "10px" }}>
-                                    <Card.Header>
-                                        <div style={{ "display": "flex", "justifyContent": "space-between" }}>
-                                            <div style={{ "textAlign": "left" }}>{data[exo.type].name}</div>
-                                            <div style={{ "textAlign": "right","fontFamily": "cursive"  }}>⏱️ {formatTime(exo.time_total)}</div>
-                                        </div>
-                                    </Card.Header>
-                                    <Card.Body>
-                                        <Card.Title>{exo.titre}</Card.Title>
-                                        <Card.Text>
-                                            {exo.description}
-                                        </Card.Text>
-                                        <div style={{ "display": "flex", "margin": "10px", "alignItems": "baseline" }}>
-                                            <Button variant="btn btn-outline-success" style={{ "marginRight": "5px" }} 
-                                            onClick={() => window.location.href = "/chrono/"+ exo.id} >Go</Button>
-                                            <Accordion style={{ "flexGrow": 1 }} >
-                                                <Accordion.Item eventKey="0">
-                                                    <Accordion.Header style={{ "fontSize": "5px", "padding": "0px" }}>
-                                                        more info ?</Accordion.Header>
-                                                    <Accordion.Body>
-                                                        {exo.getMoreInfo()}
-                                                    </Accordion.Body>
-                                                </Accordion.Item>
-                                            </Accordion>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                        })}</Row>
-                </div>
+                    return <Col>
+                        <Card style={{ "margin": "10px" }}>
+                            <Card.Header>
+                                <div style={{ "display": "flex", "justifyContent": "space-between" }}>
+                                    <div style={{ "textAlign": "left" }}>{data[exo.type].name}</div>
+                                    <div style={{ "textAlign": "right", "fontFamily": "cursive" }}>⏱️ {formatTime(exo.time_total)}</div>
+                                </div>
+                            </Card.Header>
+                            <Card.Body>
+                                <Card.Title>{exo.titre}</Card.Title>
+                                <Card.Text>
+                                    {exo.description}
+                                </Card.Text>
+                                <div style={{ "display": "flex", "margin": "10px", "alignItems": "baseline" }}>
+                                    <Button variant="btn btn-outline-success" style={{ "marginRight": "5px" }}
+                                        onClick={() => window.location.href = "/chrono/" + exo.id} >Go</Button>
+                                    <Accordion style={{ "flexGrow": 1 }} >
+                                        <Accordion.Item eventKey="0">
+                                            <Accordion.Header style={{ "fontSize": "5px", "padding": "0px" }}>
+                                                more info ?</Accordion.Header>
+                                            <Accordion.Body>
+                                                {exo.getMoreInfo()}
+                                            </Accordion.Body>
+                                        </Accordion.Item>
+                                    </Accordion>
+                                </div>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                })}</Row>
+        </div>
     }
 
     return (
         <div>
-            <h1 className='Titre2' style={{ "textAlign": "center", "marginBottom":"2vh", "marginTop":"2vh" }} >Find the session of your dreams</h1>
-            <div style={{ "marginLeft": "3vw","marginRight":"3vW", "marginBottom":"2vh" }}>
+            <h1 className='Titre2' style={{ "textAlign": "center", "marginBottom": "2vh", "marginTop": "2vh" }} >Find the session of your dreams</h1>
+            <div style={{ "marginLeft": "3vw", "marginRight": "3vW", "marginBottom": "2vh" }}>
                 <Form className="d-flex">
                     <FormControl
                         type="search"
@@ -192,15 +206,16 @@ const ChronoListPage: React.FunctionComponent<IPage & RouteComponentProps<any>> 
                         }}
                         value={trie}
                     />
-                    <Form.Select aria-label="Default select example" style={{"width":"45%"}}>
-                        <option>All</option>
+                    <Form.Select aria-label="Default select example" style={{ "width": "45%" }}
+                        value={typetrie} onChange={(e) => { setTypeTrie(e.target.value); }}>
+                        <option value="0">All</option>
                         <option value="1">Mine</option>
-                        <option value="2">Friend</option>
+                        <option value="2">Public</option>
                     </Form.Select>
                 </Form>
             </div>
             <PageRender />
-        </div> 
+        </div>
     );
 }
 

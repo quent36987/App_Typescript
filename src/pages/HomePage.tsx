@@ -11,12 +11,12 @@ const HomePage: React.FunctionComponent<IPage> = props => {
 
     return (
         <div className='HomePage'>
-            <h1 className='Titre' >Bienvenue !</h1>
+            <h1 className='Titre' >Welcome !</h1>
 
                 <div className="HomePage-content">
                         <span className="HomePage-content-quote-left">"</span>
                         <span className="HomePage-content-text">
-                        Le sport va chercher la peur pour la dominer, la fatigue pour en triompher, la difficulté pour la vaincre.
+                        Sport will seek fear to dominate it, fatigue to triumph over it, difficulty to overcome it.
                         </span>
                         <span className="HomePage-content-quote-right">"</span>
                 </div>
