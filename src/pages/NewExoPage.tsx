@@ -52,14 +52,18 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
 
     const addItem = (type: number) => {
         const i = items;
-        i.push({
-            id: items.length === 0 ? 0 : items.sort((a, b) => a.id - b.id)[items.length - 1].id + 1,
+        var n = [...items];
+        n.push({
+            id: items.length === 0 ? 0 : i.sort((a, b) => a.id - b.id)[items.length - 1].id + 1,
             name: "rest",
             time: 0,
             type: type,
             time_inf: false,
+
+            time_bis: 0,
+            cycles: 0,
         });
-        handleRLDDChange(i);
+        handleRLDDChange(n);
         setChange(!change);
     };
 
@@ -82,7 +86,13 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
         const handleChangeTime = (e, itemId) => {
             const i = items;
             const index = i.findIndex(item => item.id === itemId);
-            i[index].time = parseInt(e.target.value);
+            i[index].time = e.target.value ? parseInt(e.target.value) : 0;
+            handleRLDDChange(i);
+        };
+        const handleChangeTimebis = (e, itemId) => {
+            const i = items;
+            const index = i.findIndex(item => item.id === itemId);
+            i[index].time_bis = e.target.value ? parseInt(e.target.value) : 0;
             handleRLDDChange(i);
         };
         const handleChangeTimeing = (e, itemId) => {
@@ -92,58 +102,124 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
             handleRLDDChange(i);
             setChange(!change);
         };
+        const handleChangeCycle = (e, itemId) => {
+            const i = items;
+            const index = i.findIndex(item => item.id === itemId);
+            i[index].cycles = parseInt(e.target.value);
+            handleRLDDChange(i);
+            setChange(!change);
+        };
 
         return (
             <div >
                 <InputGroup className="mb-3 " >
-                    {item.type === 0 ?
-                        <FormControl
-                            className='itemexo'
-                            placeholder="Name of Exercise"
-                            type="text"
-                            id={"f" + item.id.toString()}
-                            onClick={(e) => document.getElementById("f" + item.id.toString()).focus()}
-                            onChange={(e) => handleChangeName(e, item.id)}
-                            style={{ "width": "60%" }}
-                            required
-                        />
-                        :
-                        <FormControl
-                            className='itemrest'
-                            placeholder="Rest Time"
-                            disabled
-                            type="text"
-                            id={"f" + item.id.toString()}
-                            onClick={(e) => document.getElementById("f" + item.id.toString()).focus()}
-                            onChange={(e) => handleChangeName(e, item.id)}
-                            style={{ "width": "60%" }}
-                        />
-                    }
-                    {type === 4 || type === 3 ? <>
-                        <FormControl aria-label="Last name" type='number' placeholder="Time in s"
-                            id={"id2" + item.id.toString()}
-                            onClick={(e) => document.getElementById("id2" + item.id.toString()).focus()}
-                            onChange={(e) => handleChangeTime(e, item.id)}
-                            required={!item.time_inf}
-                            disabled={item.time_inf} />
-                        <ToggleButton
-                            id={"binrf" + item.id.toString()}
-                            type="checkbox"
-                            variant="outline-secondary"
-                            checked={item.time_inf}
-                            value="1"
-                            onChange={(e) => {
-                                handleChangeTimeing(e, item.id);
-                            }}
-                        >
-                            ♾️
-                        </ToggleButton>
-                    </> : null}
+                    {item.type === 2 ?
+                        <>
+                            <FormControl
+                                className='itemexo'
+                                placeholder="Cycles"
+                                type="text"
+                                id={"cy" + item.id.toString()}
+                                onClick={(e) => document.getElementById("cy" + item.id.toString()).focus()}
+                                onChange={(e) => handleChangeCycle(e, item.id)}
+                                style={{ "width": "5%" }}
+                                required
+                            />
+                            <FormControl
+                                className='itemexo'
+                                placeholder="Name of Exercise"
+                                type="text"
+                                id={"na" + item.id.toString()}
+                                onClick={(e) => document.getElementById("na" + item.id.toString()).focus()}
+                                onChange={(e) => handleChangeName(e, item.id)}
+                                style={{ "width": "40%" }}
+                                required
+                            />
+                            <FormControl aria-label="Last name" type='number' placeholder="Time in s"
+                                id={"id2" + item.id.toString()}
+                                onClick={(e) => document.getElementById("id2" + item.id.toString()).focus()}
+                                onChange={(e) => handleChangeTime(e, item.id)}
+                                required={!item.time_inf}
+                                disabled={item.time_inf}
+                            />
+                            <ToggleButton
+                                id={"binrf" + item.id.toString()}
+                                type="checkbox"
+                                variant="outline-secondary"
+                                checked={item.time_inf}
+                                value="1"
+                                onChange={(e) => {
+                                    handleChangeTimeing(e, item.id);
+                                }}
+                            >
+                                ♾️
+                            </ToggleButton>
+                            <FormControl
+                                className='itemrest'
+                                placeholder="Rest Time"
+                                disabled
+                                type="text"
+                                style={{ "width": "60%" }}
+                            />
+                            <FormControl aria-label="Last name" type='number' placeholder="Time in s"
+                                id={"id3" + item.id.toString()}
+                                required
+                                onClick={(e) => document.getElementById("id3" + item.id.toString()).focus()}
+                                onChange={(e) => handleChangeTimebis(e, item.id)}
+                            />
 
+                        </>
+                        :
+                        <>   {
+                            item.type === 0 ?
+                                <FormControl
+                                    className='itemexo'
+                                    placeholder="Name of Exercise"
+                                    type="text"
+                                    id={"f" + item.id.toString()}
+                                    onClick={(e) => document.getElementById("f" + item.id.toString()).focus()}
+                                    onChange={(e) => handleChangeName(e, item.id)}
+                                    style={{ "width": "60%" }}
+                                    required
+                                />
+                                :
+                                <FormControl
+                                    className='itemrest'
+                                    placeholder="Rest Time"
+                                    disabled
+                                    type="text"
+                                    id={"f" + item.id.toString()}
+                                    onClick={(e) => document.getElementById("f" + item.id.toString()).focus()}
+                                    onChange={(e) => handleChangeName(e, item.id)}
+                                    style={{ "width": "60%" }}
+                                />
+                        }
+                            {type === 4 || type === 3 ? <>
+                                <FormControl aria-label="Last name" type='number' placeholder="Time in s"
+                                    id={"id2" + item.id.toString()}
+                                    onClick={(e) => document.getElementById("id2" + item.id.toString()).focus()}
+                                    onChange={(e) => handleChangeTime(e, item.id)}
+                                    required={!item.time_inf}
+                                    disabled={item.time_inf} />
+                                <ToggleButton
+                                    id={"binrf" + item.id.toString()}
+                                    type="checkbox"
+                                    variant="outline-secondary"
+                                    checked={item.time_inf}
+                                    value="1"
+                                    onChange={(e) => {
+                                        handleChangeTimeing(e, item.id);
+                                    }}
+                                >
+                                    ♾️
+                                </ToggleButton>
+                            </> : null}
+                        </>}
                     <Button variant="btn btn-outline-danger" id={"button-addon2" + item.id.toString()}
                         onClick={() => removeItem(item.id)}  >
                         🗑️
                     </Button>
+
                 </InputGroup>
             </div>
         );
@@ -188,8 +264,38 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                 }
                 break;
             case 4:  // Full Custom
-                exercises = items;
-                time_total += items.reduce((acc, cur) => acc + cur.time, 0);
+                const items_transforming = [];
+                items.forEach(item => {
+                    if (item.cycles > 0) {
+                        items_transforming.push({
+                            id: item.id,
+                            name: item.name,
+                            time: item.time,
+                            time_inf: item.time_inf,
+                            type: 0,
+                        });
+                        for (let i = 1; i < item.cycles; i++) {
+                            items_transforming.push({
+                                id: item.id,
+                                name: "rest",
+                                time: item.time_bis,
+                                time_inf: false,
+                                type: 1,
+                            });
+                            items_transforming.push({
+                                id: item.id,
+                                name: item.name,
+                                time: item.time,
+                                time_inf: item.time_inf,
+                                type: 0,
+                            });
+                        }
+                    } else {
+                        items_transforming.push(item);
+                    }
+                });
+                exercises = items_transforming;
+                time_total += items_transforming.reduce((acc, cur) => acc + cur.time, 0);
                 break;
             default:
                 break;
@@ -288,6 +394,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                         <Form.Control
                                             size='sm'
                                             required
+                                            disabled={cycles === 1}
                                             type="number"
                                             placeholder="in seconds"
                                             value={recovery !== 0 ? recovery : ""}
@@ -353,7 +460,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                         onChange={handleRLDDChange}
                                     />
                                 </div>
-                                {type === 4 ?
+                                {type === 4 ? <>
                                     <div>
                                         <Button variant="btn btn-outline-secondary" style={{
                                             "width": "80%",
@@ -362,7 +469,15 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                             Add Rest
                                         </Button>
                                     </div>
-                                    : null}
+                                    <div>
+                                        <Button variant="btn btn-outline-secondary" style={{
+                                            "width": "80%",
+                                            "marginBottom": "10px"
+                                        }} onClick={() => addItem(2)}>
+                                            Add Cycle
+                                        </Button>
+                                    </div>
+                                </> : null}
                                 <div>
                                     <Button variant="btn btn-outline-secondary" style={{
                                         "width": "80%",

@@ -7,7 +7,7 @@ const SearchImage = ({ image_name }) => {
     const [url, setUrl] = useState("");
     useEffect(() => {
         // delete space and number of image_name
-        var image_name_modif = image_name.replace(/[\s\d-+]/g, "").toLocaleLowerCase().
+        var image_name_modif = image_name.replace(/[\s\d-+*]/g, "").toLocaleLowerCase().
             normalize("NFD").replace(/[\u0300-\u036f]/g, "");;
         if (image_name_modif.endsWith("s")) {
             image_name_modif = image_name_modif.substring(0, image_name_modif.length - 1);

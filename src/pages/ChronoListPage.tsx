@@ -5,7 +5,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { db } from "../firebase";
 import "./chrono.css";
 import "./allPage.css";
-import { onSnapshot, collection, query, doc, getDoc } from 'firebase/firestore';
+import { onSnapshot, collection, query, doc, getDoc, orderBy } from 'firebase/firestore';
 import { AppState } from '../Context';
 import { Accordion, Button, Card, Col, Form, FormControl, Row } from 'react-bootstrap';
 import { data } from '../data/type_exo_data';
@@ -27,7 +27,7 @@ const ChronoListPage: React.FunctionComponent<IPage & RouteComponentProps<any>> 
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
         const collectionRef = collection(db, "exercises").withConverter<Exo>(ExoConverter);
-        const queryRef = query(collectionRef);
+        const queryRef = query(collectionRef,orderBy("date"));
         onSnapshot(queryRef, (snapshot) => {
             const list_exos: Exo[] = [];
             snapshot.forEach((doc) => {
