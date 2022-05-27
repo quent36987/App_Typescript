@@ -7,8 +7,9 @@ import "./allPage.css";
 import { doc, getDoc, Timestamp, arrayUnion, updateDoc } from 'firebase/firestore';
 import { AppState } from '../Context';
 import { Exo, ExoConverter } from '../data/ExoClass';
-import { Button, Modal, ProgressBar, Spinner } from 'react-bootstrap';
+import { Button, Modal, OverlayTrigger, Popover, ProgressBar, Spinner } from 'react-bootstrap';
 import { User, UserConverter } from '../data/UserClass';
+import SearchImage from '../componants/SearchImage';
 
 const dataButton = [
     {
@@ -268,6 +269,23 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                             <Button variant='btn btn-outline-primary' style={{ "margin": "1vw" }}
                                 onClick={suivant}
                                 disabled={startButton === 0}>Next</Button>
+                        </div>
+                        <div style={{"marginTop":"1vh"}}>
+                        <OverlayTrigger
+                            trigger="focus"
+                            key={'top'}
+                            placement={'top'}
+                            overlay={
+                                <Popover id={`popover-positioned-top`} style={{"width":"50vw","height":"20vh"}}>
+                                <Popover.Header as="h3">{_set > 0 && _set <= exo.exercises.length ? exo.exercises[_set - 1].name : "Recovery"} :</Popover.Header>
+                                <Popover.Body >
+                                    <SearchImage image_name={_set > 0 && _set <= exo.exercises.length ? exo.exercises[_set - 1].name : "Recovery"}/>
+                                </Popover.Body>
+                                </Popover>
+                            }
+                            >
+                            <Button variant='btn btn-outline-light'>❓</Button>
+                            </OverlayTrigger>
                         </div>
                     </div>
                 </div>

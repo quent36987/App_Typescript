@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import IPage from '../interfaces/page';
 import logging from '../config/logging';
 import './allPage.css';
+import UploadImage from '../componants/UploadImage';
+import Webscrap from '../componants/WebScrapingImage';
 
 
 const HomePage: React.FunctionComponent<IPage> = props => {
@@ -20,7 +22,6 @@ const HomePage: React.FunctionComponent<IPage> = props => {
                         </span>
                         <span className="HomePage-content-quote-right">"</span>
                 </div>
-            
         </div>
     )
 }
