@@ -10,6 +10,8 @@ import { Exo, ExoConverter } from '../data/ExoClass';
 import { Button, Modal, OverlayTrigger, Popover, ProgressBar, Spinner } from 'react-bootstrap';
 import { User, UserConverter } from '../data/UserClass';
 import SearchImage from '../componants/SearchImage';
+import bipsrc from '../assets/bip.ogg';
+import { useWakeLock } from 'react-screen-wake-lock';
 
 const dataButton = [
     {
@@ -50,11 +52,13 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
     const [_inter, setIntern] = useState(0);
 
     const [show, setShow] = useState(false);
+    const [bip, setBip] = useState(false);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
     const { user, setAlert } = AppState();
+    const { isSupported, released, request, release } = useWakeLock(); 
 
     useEffect(() => {
         async function getdata() {
@@ -104,6 +108,9 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
     }, [props, user, setAlert]);
 
     useEffect(() => {
+        if (_time === 1 && _is_start) {
+            setBip(true);
+        }
         if (_time === 0 && _is_start) {
             window.clearInterval(_inter);
             setSet(c => c + 1);
@@ -136,6 +143,7 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                 setCumulatedTimeBefore(c => c + exo.recovery_time);
                 setCycle(c => c + 1);
             }
+            //console.log("lancement du timer");
             setIntern(window.setInterval(tic, 1000));
         }
     }, [_time, _is_start, _inter, _cycle, _set, _timming, _cumulatedTime, _cumulatedTimebefore, exo]);
@@ -161,10 +169,10 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
         });
     }
 
-
     function play() {
         switch (startButton) {
             case 0:
+                request();
                 setIsStart(true);
                 setStartButton(1);
                 break;
@@ -219,9 +227,11 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
     };
 
 
+
+
     const Render = () => {
         if (exo) {
-            return (
+            return (<>
                 <div className="chrono-page">
                     <Modal show={show} onHide={handleClose}>
                         <Modal.Header closeButton>
@@ -269,26 +279,31 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                             <Button variant='btn btn-outline-primary' style={{ "margin": "1vw" }}
                                 onClick={suivant}
                                 disabled={startButton === 0}>Next</Button>
+
                         </div>
-                        <div style={{"marginTop":"1vh"}}>
-                        <OverlayTrigger
-                            trigger="focus"
-                            key={'top'}
-                            placement={'top'}
-                            overlay={
-                                <Popover id={`popover-positioned-top`} style={{"width":"50vw","height":"20vh"}}>
-                                <Popover.Header as="h3">{_set > 0 && _set <= exo.exercises.length ? exo.exercises[_set - 1].name : "Recovery"} :</Popover.Header>
-                                <Popover.Body >
-                                    <SearchImage image_name={_set > 0 && _set <= exo.exercises.length ? exo.exercises[_set - 1].name : "Recovery"}/>
-                                </Popover.Body>
-                                </Popover>
-                            }
+                        <div style={{ "marginTop": "1vh" }}>
+
+                            <OverlayTrigger
+                                trigger="focus"
+                                key={'top'}
+                                placement={'top'}
+                                overlay={
+                                    <Popover id={`popover-positioned-top`} style={{ "width": "50vw", "height": "20vh" }}>
+                                        <Popover.Header as="h3">{_set > 0 && _set <= exo.exercises.length ? exo.exercises[_set - 1].name : "Recovery"} :</Popover.Header>
+                                        <Popover.Body >
+                                            <SearchImage image_name={_set > 0 && _set <= exo.exercises.length ? exo.exercises[_set - 1].name : "Recovery"} />
+                                        </Popover.Body>
+                                    </Popover>
+                                }
                             >
-                            <Button variant='btn btn-outline-light'>❓</Button>
+                                <Button variant='btn btn-outline-light'
+                                    onClick={(event) => { setIsPause(true); setStartButton(2); }}>❓</Button>
                             </OverlayTrigger>
                         </div>
                     </div>
+                    {bip ? <audio src={bipsrc} autoPlay onEnded={() => setBip(false)}/> : null}
                 </div>
+            </>
             );
         }
         else {

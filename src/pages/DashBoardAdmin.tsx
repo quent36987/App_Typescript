@@ -133,7 +133,7 @@ const DashBoardAdminPage: React.FunctionComponent<IPage> = props => {
                             <span className="titreitemdashboard">{exo.name}</span>
                         </div>
                         <div className="itemdashboard" style={{"width":"30vw"}}>
-                            <input type='text' style={{"width":"100%"}} className="titreitemdashboard" value={exo.url}
+                            <input type='url' style={{"width":"100%"}} className="titreitemdashboard" value={exo.url}
                             onChange={(e) => handleChange(exo.name,e.target.value) }/>
                         </div>
                         <div className="itemdashboard" style={{"width":"10vw"}}>

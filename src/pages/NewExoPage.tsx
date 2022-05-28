@@ -41,6 +41,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
 
 
     const handleSubmit = (event) => {
+        console.log("re" + recovery);
         const form = event.currentTarget;
         event.preventDefault();
         event.stopPropagation();
@@ -179,7 +180,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                     id={"f" + item.id.toString()}
                                     onClick={(e) => document.getElementById("f" + item.id.toString()).focus()}
                                     onChange={(e) => handleChangeName(e, item.id)}
-                                    style={{ "width": "60%" }}
+                                    style={{ "width": "50%" }}
                                     required
                                 />
                                 :
@@ -191,7 +192,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                     id={"f" + item.id.toString()}
                                     onClick={(e) => document.getElementById("f" + item.id.toString()).focus()}
                                     onChange={(e) => handleChangeName(e, item.id)}
-                                    style={{ "width": "60%" }}
+                                    style={{ "width": "50%" }}
                                 />
                         }
                             {type === 4 || type === 3 ? <>
@@ -352,8 +353,8 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                 <div className="NewExoPage-content">
                     <div className='NewExoPage-content-form' style={{ "maxWidth": "700px" }}>
                         <Form noValidate validated={validated} onSubmit={handleSubmit}>
-                            <Row className="mb-3">
-                                <Form.Select value={type} onChange={(e) => setType(parseInt(e.target.value))}
+                            <Row className="mb-3" style={{"marginRight":"1vw","marginLeft":"1vw"}}>
+                                <Form.Select  value={type} onChange={(e) => setType(parseInt(e.target.value))}
                                     aria-label="Default select example"
                                     required
                                 >
@@ -395,10 +396,12 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                             size='sm'
                                             required
                                             disabled={cycles === 1}
-                                            type="number"
-                                            placeholder="in seconds"
-                                            value={recovery !== 0 ? recovery : ""}
-                                            onChange={(e) => setRecovery(parseInt(e.target.value))}
+                                            type="time"
+                                            placeholder="min:sec"
+                                            onChange={(e) => {
+                                                var tab = e.target.value.split(":").map(Number)
+                                                setRecovery(tab[0] * 60 + tab[1])
+                                            }}
                                         />
                                     </Form.Group>
                                 </Row>
@@ -442,11 +445,13 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                             <Form.Control
                                                 size='sm'
                                                 required
-                                                type="number"
-                                                placeholder="in seconds"
+                                                placeholder="min:sec"
                                                 disabled={type === 3}
-                                                value={time_cycle ? time_cycle : ""}
-                                                onChange={(e) => setTime_cycle(parseInt(e.target.value))}
+                                                type="time"
+                                                onChange={(e) => {
+                                                    var tab = e.target.value.split(":").map(Number)
+                                                    setTime_cycle(tab[0] * 60 + tab[1])
+                                                }}
                                             />
                                         </Form.Group>
                                     </Row>
