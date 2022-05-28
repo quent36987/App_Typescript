@@ -1,11 +1,11 @@
 import { addDoc, arrayUnion, collection, doc, onSnapshot, query, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Col, Form, Row } from "react-bootstrap";
 import logging from "../config/logging";
 import { Exo, ExoConverter } from "../data/ExoClass";
 import { ImageClass, ImageConverter } from "../data/ImageClass";
 import { db } from "../firebase";
 import IPage from "../interfaces/page";
+import { StringSymplify } from "../Utils/utils";
 import './allPage.css';
 
 
@@ -55,19 +55,11 @@ const DashBoardAdminPage: React.FunctionComponent<IPage> = props => {
     }, [props])
 
 
-    function nameTransform(name : string)
-    {
-         var image_name_modif = name.replace(/[\s\d-+]/g, "").toLocaleLowerCase().
-        normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        if (image_name_modif.endsWith("s")) {
-        image_name_modif = image_name_modif.substring(0, image_name_modif.length - 1);
-        }
-        return image_name_modif;
-    }
+    
 
     function findUrl(name: string) {
        
-        return List_image.find(x => x.name?.includes(nameTransform(name)));
+        return List_image.find(x => x.name?.includes(StringSymplify(name)));
     }
 
     function handleChange(exoname,value) {
@@ -113,14 +105,14 @@ const DashBoardAdminPage: React.FunctionComponent<IPage> = props => {
         var img = List_image.find(x => x.url === url)
         if (img ) {
             const UserDocRef = doc(db, 'images', img.id);
-            const payload = { name: arrayUnion(nameTransform(_name)) };
+            const payload = { name: arrayUnion(StringSymplify(_name)) };
             updateDoc(UserDocRef, payload);
             console.log("add !");
         }
         else{
             console.log(url);
             const collectionRef = collection(db, "images");
-            addDoc(collectionRef, { url: url, name: [nameTransform(_name)] });
+            addDoc(collectionRef, { url: url, name: [StringSymplify(_name)] });
             console.log("add !");
         }
     }

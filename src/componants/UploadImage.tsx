@@ -7,6 +7,7 @@ import {
 import { v4 } from "uuid";
 import { db, storage } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
+import { StringSymplify } from "../Utils/utils";
 
 function UploadImage() {
     const [imageUpload, setImageUpload] = useState(null);
@@ -19,14 +20,7 @@ function UploadImage() {
         //split image_name with ; and create a array
         var image_name_array = image_name.split(";");
         for (var i = 0; i < image_name_array.length; i++) {
-            //delete space and number of image_name_array
-            image_name_array[i] = image_name_array[i].replace(/[\s\d-+]/g, "").toLocaleLowerCase();
-            //delete the accent
-            image_name_array[i] = image_name_array[i].normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            //if finish with s delete it
-            if (image_name_array[i].endsWith("s")) {
-                image_name_array[i] = image_name_array[i].substring(0, image_name_array[i].length - 1);
-            }
+            image_name_array[i] = StringSymplify(image_name_array[i]);
         }
         if (imageUploadinput !== "") {
        
