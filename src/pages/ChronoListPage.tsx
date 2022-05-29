@@ -7,10 +7,11 @@ import "./chrono.css";
 import "./allPage.css";
 import { onSnapshot, collection, query, doc, getDoc, orderBy } from 'firebase/firestore';
 import { AppState } from '../Context';
-import { Accordion, Button, Card, Col, Form, FormControl, Row } from 'react-bootstrap';
+import { Accordion, Button, Card, Col, Form, FormControl, Row, Spinner } from 'react-bootstrap';
 import { data } from '../data/type_exo_data';
 import { User, UserConverter } from '../data/UserClass';
 import { Exo, ExoConverter } from '../data/ExoClass';
+import { formatTime } from '../Utils/utils';
 
 
 
@@ -36,6 +37,7 @@ const ChronoListPage: React.FunctionComponent<IPage & RouteComponentProps<any>> 
                 list_exos.push(exo);
             });
             setListExoPublic(list_exos);
+            console.log("pub" , list_exo_public);
         });
     }, [props])
     useEffect(() => {
@@ -45,13 +47,15 @@ const ChronoListPage: React.FunctionComponent<IPage & RouteComponentProps<any>> 
                 try {
                     const docc = await getDoc(docRef);
                     setListUser(docc.data());
+                    console.log(user_info);
                     const list: Exo[] = [];
                     docc.data().exo.forEach((doc: Exo, index) => {
                         list.push(new Exo(doc.cycles, doc.date, doc.description, doc.exercises,
                             doc.recovery_time, doc.rest_time, doc.time_total,
-                            doc.titre, doc.type, doc.useruid, index.toString()));
+                            doc.titre, doc.type, doc.useruid, doc.id));
                     });
                     setListExoUser(list);
+                    
                 } catch (e) {
 
                     console.log("Error getting cached document:", e);
@@ -73,17 +77,13 @@ const ChronoListPage: React.FunctionComponent<IPage & RouteComponentProps<any>> 
     }, [typetrie, list_exo_public, list_exo_user]);
 
 
-    function formatTime(time: number) {
-        const minutes = Math.floor(time / 60);
-        let seconds = time % 60;
-        if (seconds < 10) {
-            return `${minutes}:0${seconds}`
-        }
-        return `${minutes}:${seconds}`;
-    }
-
     // return list with all exo or a timer of one exo
     function PageRender() {
+        if (list_exo.length === 0) {
+            return <div className="spinner-border" role="status" >
+                <span className="sr-only">Loading...</span>
+            </div>
+        }
         return <div className="courselist">
             <Row xs={1} md={2} className="g-0">
                 {list_exo.filter(exo => {
@@ -100,7 +100,8 @@ const ChronoListPage: React.FunctionComponent<IPage & RouteComponentProps<any>> 
                             <Card.Header>
                                 <div style={{ "display": "flex", "justifyContent": "space-between" }}>
                                     <div style={{ "textAlign": "left" }}>{data[exo.type].name}</div>
-                                    <div style={{ "textAlign": "right", "fontFamily": "cursive" }}>⏱️ {formatTime(exo.time_total)}</div>
+                                    <div style={{ "textAlign": "right", "fontFamily": "cursive" }}>⏱️ {formatTime(exo.time_total)}
+                                    {user_info && user_info.exo_log.find(e => e.id === exo.id) ? " ✔️" : " ❌"}  </div>
                                 </div>
                             </Card.Header>
                             <Card.Body>
@@ -128,7 +129,7 @@ const ChronoListPage: React.FunctionComponent<IPage & RouteComponentProps<any>> 
         </div>
     }
 
-    return (
+    return ( 
         <div>
             <h1 className='Titre2' style={{ "textAlign": "center", "marginBottom": "2vh", "marginTop": "2vh" }} >Find the session of your dreams</h1>
             <div style={{ "marginLeft": "3vw", "marginRight": "3vW", "marginBottom": "2vh" }}>
@@ -152,7 +153,7 @@ const ChronoListPage: React.FunctionComponent<IPage & RouteComponentProps<any>> 
                     </Form.Select>
                 </Form>
             </div>
-            <PageRender />
+             <PageRender /> 
         </div>
     );
 }

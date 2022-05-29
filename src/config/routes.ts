@@ -6,6 +6,7 @@ import AuthPage from '../pages/AuthPage';
 import ChronoListPage from '../pages/ChronoListPage';
 import ChronoForm from '../pages/NewExoPage';
 import DashBoardAdminPage from '../pages/DashBoardAdmin';
+import TimerPage from '../pages/TimerPage';
 
 const routes: IRoute[] = [
     {
@@ -48,6 +49,12 @@ const routes: IRoute[] = [
         path: '/dashboard',
         name: 'DashBoard Page',
         component: DashBoardAdminPage,
+        exact: true
+    },
+    {
+        path: '/timer',
+        name: 'Timer Page',
+        component: TimerPage,
         exact: true
     }
 ]

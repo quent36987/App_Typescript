@@ -28,7 +28,7 @@ const App = () => {
       className="px-3 py-8"
     >
       <Navbar.Brand href="/">
-        AppSport
+        AppSport💪🏽
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="responsive-navbar-na" />
       <Navbar.Collapse id="responsive-navbar-nav">
@@ -39,6 +39,7 @@ const App = () => {
             <NavDropdown.Divider />
             <NavDropdown.Item href="/">More information ?</NavDropdown.Item>
           </NavDropdown>
+          <Nav.Link href="/timer" >Timer</Nav.Link>
           <Nav.Link href="/profile" >Profile</Nav.Link>
         </Nav>
         <Nav>

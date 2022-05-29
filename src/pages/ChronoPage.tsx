@@ -73,8 +73,8 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                         const docRef = doc(db, "Users", user.uid).withConverter<User>(UserConverter);
                         try {
                             const docc = await getDoc(docRef);
-                            if (docc.exists() && docc.data().exo.length > parseInt(props.match.params.exoId)) {
-                                var val = docc.data().exo[parseInt(props.match.params.exoId)];
+                            var val = null;
+                            if (docc.exists() && (val = docc.data().exo.find(e => e.id === props.match.params.exoId))) {
                                 setExo(new Exo(val.cycles, val.date, val.description, val.exercises,
                                     val.recovery_time, val.rest_time, val.time_total,
                                     val.titre, val.type, val.useruid, props.match.params.exoId));
@@ -112,6 +112,7 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
             setBip(true);
         }
         if (_time === 0 && _is_start) {
+            request();
             window.clearInterval(_inter);
             setSet(c => c + 1);
             console.log(_set);

@@ -11,3 +11,12 @@ export function StringSymplify(name : string)
         }
         return name_modif;
 }
+
+export function formatTime(time: number) {
+    const minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+    if (seconds < 10) {
+        return `${minutes}:0${seconds}`
+    }
+    return `${minutes}:${seconds}`;
+}

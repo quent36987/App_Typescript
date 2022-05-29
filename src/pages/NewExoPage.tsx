@@ -9,7 +9,7 @@ import { db } from '../firebase';
 import { AppState } from '../Context';
 import { Item } from '../data/ItemType';
 import { data } from '../data/type_exo_data';
-
+import { v4 } from "uuid";
 
 
 const ChronoForm: React.FunctionComponent<IPage> = props => {
@@ -257,7 +257,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
             case 3: // Serie Exo (add rest time beteewn exo)
                 for (let exo = 0; exo < lengthItem; exo++) {
                     exercises.push(items[exo]);
-                    time_total += items[exo].time;
+                    time_total += items[exo].time_inf ? 15 : items[exo].time;
                     if (exo < lengthItem - 1) {
                         exercises.push({ id: 0, name: "rest", type: 1, time: rest_time, time_inf: false })
                         time_total += rest_time;
@@ -271,7 +271,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                         items_transforming.push({
                             id: item.id,
                             name: item.name,
-                            time: item.time,
+                            time: item.time_inf ? 15 : item.time,
                             time_inf: item.time_inf,
                             type: 0,
                         });
@@ -286,7 +286,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                             items_transforming.push({
                                 id: item.id,
                                 name: item.name,
-                                time: item.time,
+                                time: item.time_inf ? 15 : item.time,
                                 time_inf: item.time_inf,
                                 type: 0,
                             });
@@ -306,6 +306,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
         time_total += (cycles - 1) * recovery;
         //send the message
         const payload = {
+            id : v4(),
             titre: titre,
             date: Timestamp.now(),
             cycles: cycles,

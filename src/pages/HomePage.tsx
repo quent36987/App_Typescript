@@ -12,7 +12,7 @@ const HomePage: React.FunctionComponent<IPage> = props => {
 
     return (
         <div className='HomePage'>
-            <h1 className='Titre' >Welcome !</h1>
+            <h1 className='Titre' >Welcome ! 😑</h1>
 
                 <div className="HomePage-content">
                         <span className="HomePage-content-quote-left">"</span>
