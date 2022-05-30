@@ -6,8 +6,6 @@ import { Button, ProgressBar } from 'react-bootstrap';
 import bipsrc from '../assets/bip.ogg';
 import { useWakeLock } from 'react-screen-wake-lock';
 import { formatTime } from '../Utils/utils';
-import { time } from 'console';
-
 
 
 const TimerPage: React.FunctionComponent<IPage> = props => {
@@ -16,7 +14,7 @@ const TimerPage: React.FunctionComponent<IPage> = props => {
     const [_timming, setTimming] = useState(0);
     const [_is_pause, setIsPause] = useState(false);
     const [bip, setBip] = useState(false);
-
+    const { request } = useWakeLock(); 
 
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
@@ -37,7 +35,6 @@ const TimerPage: React.FunctionComponent<IPage> = props => {
         return () => clearInterval(interval);
     }, [_is_pause,_time]);
 
-
     const Timebuttons = [
     { time: 20, label: "20s" },
     { time: 30, label: "30s" },
@@ -52,7 +49,6 @@ const TimerPage: React.FunctionComponent<IPage> = props => {
     { time: 300, label: "5m" },
     ];
 
-
     return (
         <div className="chrono-page">
             <div className="timer" >
@@ -65,11 +61,12 @@ const TimerPage: React.FunctionComponent<IPage> = props => {
                 <div style={{ "display": "flex", "flexWrap": "wrap","alignContent":"stretch","justifyContent":"center" }}>
                     {Timebuttons.map((button, index) => {
                         return (
-                            <Button key={index} style={{ "margin": "1vh" }} variant="outline-secondary" onClick={() => {setTime(button.time);setTimming(button.time); }}>{button.label}</Button>
+                            <Button key={index} style={{ "margin": "1vh" }} 
+                            variant="outline-secondary" 
+                            onClick={() => {setTime(button.time);setTimming(button.time);request(); }}>{button.label}</Button>
                         )
                     })}
                 </div>
-
                 <div style={{ "display": "flex", "flexWrap": "wrap","alignContent":"stretch","justifyContent":"center" }}>
                     <input type="time" id="time" name="time" style={{ "margin": "1vh" }} 
                         onChange={(e) => {
@@ -78,21 +75,18 @@ const TimerPage: React.FunctionComponent<IPage> = props => {
                         setTimming(tab[0] * 60 + tab[1]);
                         setIsPause(true)}} 
                     />
-                    <Button variant="outline" onClick={() => {setTime(_timming);setIsPause(true)}}>🔃</Button>
+                    <Button variant="outline" onClick={() => {setTime(_timming);setIsPause(true);request();}}>🔃</Button>
                 </div>
-
                 <div style={{ "display": "flex", "flexWrap": "wrap","alignContent":"stretch","justifyContent":"center" }}>
                     <Button style={{ "margin": "1vh" }} 
                         variant={_is_pause ? "outline-success" : "outline-danger" } 
                         onClick={() => setIsPause(!_is_pause)}>{_is_pause ? "Start" : "Stop"}
                     </Button>
                 </div>
-
                 {bip ? <audio src={bipsrc} autoPlay onEnded={() => setBip(false)} /> : null}
             </div>
         </div>
     )
 }
-
 
 export default TimerPage;

@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import IPage from '../interfaces/page';
 import logging from '../config/logging';
 import './allPage.css';
-
 
 const HomePage: React.FunctionComponent<IPage> = props => {
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
     }, [props.name])
-
 
     return (
         <div className='HomePage'>

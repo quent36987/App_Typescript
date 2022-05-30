@@ -3,10 +3,10 @@ import IPage from '../interfaces/page';
 import logging from '../config/logging';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { AppState } from '../Context';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import './allPage.css';
-import { Button, Spinner, Tab, Tabs } from 'react-bootstrap';
+import { Button, Pagination, Spinner, Tab, Table, Tabs } from 'react-bootstrap';
 import { Avatar } from '@material-ui/core';
 
 import {
@@ -22,7 +22,11 @@ import {
 } from 'chart.js';
 import { Line, Pie } from 'react-chartjs-2';
 import { User, UserConverter } from '../data/UserClass';
+import { formatTime } from '../Utils/utils';
+import { Exo } from '../data/ExoClass';
 
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const choix = ['week', 'Month', 'Year'];
 
 ChartJS.register(
     CategoryScale,
@@ -44,10 +48,15 @@ const options = {
     },
 };
 
-const labels = ['January', 'February', 'March', 'April', 'May', 'June'];
+// recup les données et crée tab [jour 1->31 ; minute tt]
+// possibilité de choisir => mois,années
+// pading annee => anne -5 
+// pading mois => tout les mois
+// usestate : choix_padding
 
+const label = ['January', 'February', 'March', 'April', 'May', 'June'];
 const data = {
-    labels,
+    label,
     datasets: [
         {
             label: 'Dataset 1',
@@ -91,6 +100,11 @@ const ProfilePage: React.FunctionComponent<IPage & RouteComponentProps<any>> = p
     const { user, setAlert } = AppState();
     const [userdata, setUserdata] = useState<User>(null);
 
+    const [choix_pick, setChoix_pick] = useState(0);
+    const [day_pick, setDayPick] = useState(new Date());
+    const [label_day, setLabelDay] = useState<string[]>([]);
+    const [valeur_day, setValeurDay] = useState<number[]>([]);
+
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
     }, [props]);
@@ -117,84 +131,149 @@ const ProfilePage: React.FunctionComponent<IPage & RouteComponentProps<any>> = p
         getdata();
     }, [user, setAlert]);
 
+    useEffect(() => {
+        // create the valeur day with the time of the day
+        if (userdata) {
+            const valeur_tmp = [];
+            const label_tmp = [];
+            if (choix_pick === 1) {
+                const log_month = userdata.exo_log.filter(log => log.date.toDate().getMonth() === day_pick.getMonth()
+                    && log.date.toDate().getFullYear() === day_pick.getFullYear());
+                const nb_jour = new Date(day_pick.getFullYear(), day_pick.getMonth() + 1, 0).getDate();
+                //parcourir les jours du mois et les ajouter dans le tableau
+                for (let i = 1; i <= nb_jour; i++) {
+                    const day_tmp = new Date(day_pick.getFullYear(), day_pick.getMonth(), i);
+                    const log_day = log_month.filter(log => log.date.toDate().getDate() === day_tmp.getDate());
+                    const valeur_day_tmp_tmp = log_day.reduce((acc, val) => acc + val.time, 0);
+                    valeur_tmp.push(valeur_day_tmp_tmp / 60);
+                    label_tmp.push(day_tmp.getDate().toString());
+                }
+            }
+            else {
+                const log_year = userdata.exo_log.filter(log => log.date.toDate().getFullYear() === day_pick.getFullYear());
+                //parcourir les mois du mois et les ajouter dans le tableau
+                for (let i = 0; i <= 12; i++) {
+                    const day_tmp = new Date(day_pick.getFullYear(), i, 1);
+                    const log_day = log_year.filter(log => log.date.toDate().getMonth() === day_tmp.getMonth());
+                    const valeur_day_tmp_tmp = log_day.reduce((acc, val) => acc + val.time, 0);
+                    valeur_tmp.push(valeur_day_tmp_tmp / 60);
+                    label_tmp.push(months[i]);
+                }
+            }
+            setValeurDay(valeur_tmp);
+            setLabelDay(label_tmp);
+        }
+    }, [userdata, day_pick, choix_pick]);
+
+
+
+    const PaginationDate = () => {
+        return (
+            <div style={{"display": "flex", "flexDirection":"column", "justifyContent": "center"}}>
+                <div style={{"alignSelf":"center"}}>
+                <Pagination size='sm' style={{ "marginBottom": "5px" }}>
+                    {choix.map((choix, index) => (
+                        <Pagination.Item key={index}
+                            disabled={0 === index}
+                            active={choix_pick === index}
+                            onClick={() => setChoix_pick(index)}>
+                            {choix}
+                        </Pagination.Item>
+                    ))}
+                </Pagination></div>
+                <Pagination size="sm">
+                    <Pagination.First />
+                    {[-2, -1, 0, 1, 2].map(i => {
+                        return (
+                            <Pagination.Item
+                                key={i}
+                                active={i === 0}
+                                onClick={() => {
+                                    if (choix_pick === 1) {
+                                        setDayPick(new Date(day_pick.getFullYear(), (day_pick.getMonth() + i + 12) % 12, 1));
+                                    } else if (choix_pick == 2){
+                                        setDayPick(new Date(day_pick.getFullYear() + i, day_pick.getMonth(), 1));
+                                    }
+                                }}
+                            >
+                                {choix_pick === 1 ? months[(day_pick.getMonth() + i + 12) % 12] : day_pick.getFullYear() + i}
+                            </Pagination.Item>
+                        );
+                    })}
+                    <Pagination.Last />
+                </Pagination>
+            </div>
+        );
+    };
+
+
     const ProfilRender = () => {
         if (userdata) {
             return (
-                <>
-                    <div className='divDashboard'>
-                        <div className='div-Profile' >
-                            <div className='div-Profile-Avatar'>
-                                <Avatar
-                                    style={{
-                                        height: '10vw',
-                                        width: '10vw',
-                                        margin: '1vw',
-                                        cursor: "pointer",
-                                        backgroundColor: "#EEBC1D",
-                                        marginBottom: "5vh",
-                                    }}
-                                    src={user ? user.photoURL : ""}
-                                    alt={user ? user.displayName || user.email : ""}
-                                />
-                                <p>{userdata.firstName} {userdata.lastName}</p>
-                            </div>
-                            <div className='div-Profile-info'>
-                                <div className='div-Profile-info-item'>
-                                    <span className='titreitem'>First Name</span>
-                                    <span className='valeuritem'> {userdata.firstName} </span>
+                <> 
+                <h1 className='Titre2' style={{ "textAlign": "center", "marginBottom": "1vh", "marginTop": "2vh" }} >Profile Page</h1>
+                        <Tabs defaultActiveKey="p2" id="uncontrolled-tab-example" className="">
+                            <Tab eventKey="p1" title="Profile Information" style={{"marginTop":"1vh"}}>
+                                <p>Profile information to come</p>
+                            </Tab>
+                            <Tab eventKey="p2" title="Time Stats" style={{"marginTop":"1vh"}}>
+                               <div style={{"display": "flex", "flexDirection":"column", "justifyContent": "center"}}>
+                                 <div style={{"alignSelf":"center"}}>   
+                                <PaginationDate />
                                 </div>
-                                <div className='div-Profile-info-item'>
-                                    <span className='titreitem'>Last Name</span>
-                                    <span className='valeuritem'> {userdata.lastName} </span>
-                                </div>
-                                <div className='div-Profile-info-item'>
-                                    <span className='titreitem'>Genre</span>
-                                    <span className='valeuritem'> {userdata.genre} </span>
-                                </div>
-                                <div className='div-Profile-info-item'>
-                                    <span className='titreitem'>Date inscription</span>
-                                    <span className='valeuritem'> {userdata.date_inscription !==null ? userdata.date_inscription.toDate().toDateString() : null} </span>
-                                </div>
-                                <div className='div-Profile-info-item'>
-                                    <span className='titreitem'>Dernier séance faite</span>
-                                    <span className='valeuritem'> {userdata.last_exo_date !==null ? userdata.last_exo_date.toDate().toDateString() : null} </span>
-                                </div>
-                                <div className='div-Profile-info-item'>
-                                    <span className='titreitem'>Temps total</span>
-                                    <span className='valeuritem'> {userdata.temps_tt} </span>
-                                </div>
-                                <div className='div-Profile-info-item'>
-                                    <span className='titreitem'>Jour conséxutif</span>
-                                    <span className='valeuritem'> {userdata.genre} </span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='div-Profile-exo'>
-                            <Tabs defaultActiveKey="home" id="uncontrolled-tab-example" className="mb-3">
-                                <Tab eventKey="home" title="Exercices" style={{
-                                    "maxWidth": "90vw",
-                                    "paddingLeft": "4vw",
-                                    "paddingRight": "4vw"
-                                }}>
-                                    <Line options={options} data={data} />
-                                </Tab>
-                                <Tab eventKey="profile" title="Stats" style={{
-                                    "maxWidth": "90vw", "paddingLeft": "4vw",
-                                    "paddingRight": "4vw"
-                                }}>
-                                    <Pie data={data2} />
-                                </Tab>
-                                <Tab eventKey="contact" title="Graphique" style={{
-                                    "maxWidth": "90vw", "paddingLeft": "4vw",
-                                    "paddingRight": "4vw"
-                                }}>
-                                    <p>profdfgile</p>
-                                    <p>prdfgofile</p>
-                                </Tab>
-                            </Tabs>
-                        </div>
+                                <div style={{"width":"95vw","alignSelf":"center","maxWidth":"700px"}}> 
+                                 <Line 
+                                    data={{
+                                    labels: label_day,
+                                    datasets: [
+                                        {
+                                            label: 'Time in minutes',
+                                            data: valeur_day,
+                                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                            borderColor: 'rgba(255, 99, 132, 1)',
+                                            borderWidth: 1,
+                                        }
+                                    ]
+                                }} /></div>
+                               </div>
+                            </Tab>
+                            <Tab eventKey="p3" title="Your sessions" style={{"marginTop":"1vh"}}>
+                                <Table responsive>
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Date</th>
+                                            <th>Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {userdata.exo.map((log, index) => (
+                                            <tr key={index}>
+                                                <td>{index + 1}</td>
+                                                <td>{log.titre}</td>
+                                                <td>{log.date.toDate().toLocaleDateString()}</td>
+                                                <td>{formatTime(log.time_total)}</td>
+                                                <td ><Button variant="outline-info" onClick={() => console.log("detail")}>✏️</Button></td> 
+                                                <td><Button  variant="outline-danger" onClick={() => {
+                                                    if (window.confirm('Are you sure you wish to delete this item?')) {
+                                                        userdata.exo.splice(index, 1);
+                                                        setUserdata({ ...userdata });
+                                                        const ref = doc(db, "Users", user.uid).withConverter(UserConverter);
+                                                        setDoc(ref, userdata);
+                                                    }
+                                                } }>🗑️</Button></td>                                            
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
+                            </Tab>
+                            <Tab eventKey="p4" title="Graphique" style={{"marginTop":"1vh"}}>
+                                <p>profdfgile</p>
+                                <p>prdfgofile</p>
+                            </Tab>
+                        </Tabs> 
 
-                    </div>
                 </>
             )
         }

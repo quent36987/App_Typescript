@@ -1,6 +1,13 @@
 import { Timestamp } from "firebase/firestore";
 import { Exo } from "./ExoClass";
 
+
+export type exo_log ={
+    date : Timestamp,
+    id : string,
+    time : number
+}
+
 export class User {
     public firstName: string;
     public lastName: string;
@@ -8,7 +15,7 @@ export class User {
     public date_inscription: Timestamp;
     public last_exo_date: Timestamp;
     public temps_tt: number;
-    public exo_log = [];
+    public exo_log : exo_log[] = [];
     public exo: Exo[] = [];
 
     constructor(firstName, lastName, exo_log, date_inscription, exo: Exo[], genre) {
@@ -54,7 +61,9 @@ export const UserConverter = {
         return {
             firstName: user.firstName,
             lastName: user.lastName,
-            exo: user.exo,
+            genre: user.genre,
+            exercises: user.exo,
+            exo_log: user.exo_log,
             date_inscription: user.date_inscription
         };
     },

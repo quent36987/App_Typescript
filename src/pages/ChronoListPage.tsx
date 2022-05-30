@@ -7,7 +7,7 @@ import "./chrono.css";
 import "./allPage.css";
 import { onSnapshot, collection, query, doc, getDoc, orderBy } from 'firebase/firestore';
 import { AppState } from '../Context';
-import { Accordion, Button, Card, Col, Form, FormControl, Row, Spinner } from 'react-bootstrap';
+import { Accordion, Button, Card, Col, Form, FormControl, Row } from 'react-bootstrap';
 import { data } from '../data/type_exo_data';
 import { User, UserConverter } from '../data/UserClass';
 import { Exo, ExoConverter } from '../data/ExoClass';
