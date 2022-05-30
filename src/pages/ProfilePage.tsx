@@ -7,7 +7,7 @@ import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import './allPage.css';
 import { Button, Pagination, Spinner, Tab, Table, Tabs } from 'react-bootstrap';
-import { Avatar } from '@material-ui/core';
+
 
 import {
     Chart as ChartJS,
@@ -20,10 +20,10 @@ import {
     Legend,
     ArcElement,
 } from 'chart.js';
-import { Line, Pie } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import { User, UserConverter } from '../data/UserClass';
 import { formatTime } from '../Utils/utils';
-import { Exo } from '../data/ExoClass';
+
 
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const choix = ['week', 'Month', 'Year'];
@@ -254,7 +254,9 @@ const ProfilePage: React.FunctionComponent<IPage & RouteComponentProps<any>> = p
                                                 <td>{log.titre}</td>
                                                 <td>{log.date.toDate().toLocaleDateString()}</td>
                                                 <td>{formatTime(log.time_total)}</td>
-                                                <td ><Button variant="outline-info" onClick={() => console.log("detail")}>✏️</Button></td> 
+                                                <td ><Button variant="outline-info" 
+                                                onClick={() => window.location.href = "/updateform/" + log.id}
+                                                >✏️</Button></td> 
                                                 <td><Button  variant="outline-danger" onClick={() => {
                                                     if (window.confirm('Are you sure you wish to delete this item?')) {
                                                         userdata.exo.splice(index, 1);

@@ -4,44 +4,123 @@ import logging from '../config/logging';
 import { Button, Col, FloatingLabel, Form, FormControl, InputGroup, Row, ToggleButton } from 'react-bootstrap';
 import RLDD from 'react-list-drag-and-drop/lib/RLDD';
 import './allPage.css';
-import { addDoc, arrayUnion, collection, doc, Timestamp, updateDoc } from 'firebase/firestore';
+import { arrayUnion,  doc,  getDoc,  updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { AppState } from '../Context';
 import { Item } from '../data/ItemType';
-import { data } from '../data/type_exo_data';
-import { v4 } from "uuid";
+import { Exo, ExoConverter } from '../data/ExoClass';
+import { User, UserConverter } from '../data/UserClass';
+import { RouteComponentProps } from 'react-router-dom';
 
 
-const ChronoForm: React.FunctionComponent<IPage> = props => {
+const UpdateExoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = props => {
 
-    const { user, setAlert, perm } = AppState();
-
-    const [type, setType] = React.useState(0);
-
+    const { user, setAlert } = AppState();
     const [titre, setTitre] = React.useState("");
     const [cycles, setCycles] = React.useState(0);
     const [recovery, setRecovery] = React.useState(0);
-
     const [description, setDescription] = React.useState("");
-
-    const [exercices_time, setExercices_time] = React.useState(0);
     const [rest_time, setRest_time] = React.useState(0);
-    const [time_cycle, setTime_cycle] = React.useState(0);
-
     const [items, setItems] = useState<Item[]>([]);
-
     const [isPublic, setIsPublic] = useState(false);
-
     const [validated, setValidated] = useState(false);
     const [change, setChange] = useState(false);
+    const [exo, setExo] = useState<Exo>(null);
+
+    const [exos, setExos] = useState<Exo[]>([]);
 
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
     }, [props])
 
 
+    useEffect(() => {
+        console.log(exo);
+        if (exo) {
+            setTitre(exo.titre);
+            setCycles(exo.cycles);
+            setRecovery(exo.recovery_time);
+            setDescription(exo.description);
+            setRest_time(exo.rest_time);
+           
+            const list: Item[] = [];
+            exo.exercises.forEach((e,i)=> {
+                list.push({
+                    id : i,
+                    name : e.name,
+                    time : e.time,
+                    type : e.type,
+                    time_inf : e.time_inf,
+
+                    time_bis : 0,
+                    cycles : 0,
+                })
+            });
+
+            handleRLDDChange(list);
+            setChange(!change);
+
+           
+           
+        }
+    }, [exo])
+
+
+    useEffect(() => {
+        async function getdata() {
+            if (props.match.params.exoId) {
+                console.log("id" + props.match.params.exoId);
+                const ref = doc(db, "exercises", props.match.params.exoId).withConverter(ExoConverter);
+                const docSnap = await getDoc(ref);
+                if (docSnap.exists()) {
+                    setExo(docSnap.data());
+                    setIsPublic(true);
+                } else {
+                    if (user) {
+                        const docRef = doc(db, "Users", user.uid).withConverter<User>(UserConverter);
+                        try {
+                            const docc = await getDoc(docRef);
+                            setExos(docc.data().exo);
+                            setIsPublic(false);
+                            var val = null;
+                            if (docc.exists() && (val = docc.data().exo.find(e => e.id === props.match.params.exoId))) {
+                                setExo(new Exo(val.cycles, val.date, val.description, val.exercises,
+                                    val.recovery_time, val.rest_time, val.time_total,
+                                    val.titre, val.type, val.useruid, props.match.params.exoId));
+                            }
+                        } catch (e) {
+                            console.log("Error getting cached document:", e);
+                            setAlert({
+                                open: true,
+                                message: "Error getting cached document",
+                                type: "error",
+                            });
+
+                        }
+                        setAlert({
+                            open: false,
+                            message: "exercises doesnt exist ?!",
+                            type: "success",
+                        });
+                    }
+                    else {
+                        setAlert({
+                            open: true,
+                            message: "exercises doesnt exist ?!",
+                            type: "error",
+                        });
+                    }
+                }
+            }
+        };
+        getdata();
+    }, [props, user, setAlert]);
+
+
     const handleSubmit = (event) => {
         console.log("re" + recovery);
+        console.log(items);
+       
         const form = event.currentTarget;
         event.preventDefault();
         event.stopPropagation();
@@ -56,7 +135,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
         var n = [...items];
         n.push({
             id: items.length === 0 ? 0 : i.sort((a, b) => a.id - b.id)[items.length - 1].id + 1,
-            name: "rest",
+            name: type == 0 ? null : "rest",
             time: 0,
             type: type,
             time_inf: false,
@@ -76,7 +155,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
         setChange(!change);
     };
 
-    const itemRenderer = (item: Item, index: number): JSX.Element => {
+    function ItemRenderer  (item: Item, index: number) {
 
         const handleChangeName = (e, itemId) => {
             const i = items;
@@ -130,6 +209,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                 className='itemexo'
                                 placeholder="Name of Exercise"
                                 type="text"
+                              
                                 id={"na" + item.id.toString()}
                                 onClick={(e) => document.getElementById("na" + item.id.toString()).focus()}
                                 onChange={(e) => handleChangeName(e, item.id)}
@@ -174,12 +254,13 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                         <>   {
                             item.type === 0 ?
                                 <FormControl
-                                    className='itemexo'
-                                    placeholder="Name of Exercise"
+                                    className="Name of Exercise"
+                                    placeholder={item.name ? item.name : "Name of Exercise"}
                                     type="text"
+                                    value={item.name}
                                     id={"f" + item.id.toString()}
                                     onClick={(e) => document.getElementById("f" + item.id.toString()).focus()}
-                                    onChange={(e) => handleChangeName(e, item.id)}
+                                    onChange={(e) => {   setChange(!change); ;handleChangeName(e, item.id) }}
                                     style={{ "width": "50%" }}
                                     required
                                 />
@@ -195,11 +276,12 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                     style={{ "width": "50%" }}
                                 />
                         }
-                            {type === 4 || type === 3 ? <>
+                           
                                 <FormControl aria-label="Last name" type='number' placeholder="Time in s"
                                     id={"id2" + item.id.toString()}
+                                    value={item.time}
                                     onClick={(e) => document.getElementById("id2" + item.id.toString()).focus()}
-                                    onChange={(e) => handleChangeTime(e, item.id)}
+                                    onChange={(e) =>{ setChange(!change); handleChangeTime(e, item.id)}}
                                     required={!item.time_inf}
                                     disabled={item.time_inf} />
                                 <ToggleButton
@@ -214,7 +296,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                 >
                                     ♾️
                                 </ToggleButton>
-                            </> : null}
+                            
                         </>}
                     <Button variant="btn btn-outline-danger" id={"button-addon2" + item.id.toString()}
                         onClick={() => removeItem(item.id)}  >
@@ -238,94 +320,75 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
         var lengthItem = items.length;
         var time_total = 0;
         let index_exo = 0;
-        switch (type) {
-            case 1:  // Tabata = > exo + rest... (time of cycle tabata)
-                while (index_exo * (rest_time + exercices_time) < time_cycle) {
-                    var exo = items[index_exo % lengthItem];
-                    exo.time = exercices_time;
-                    exercises.push(exo);
-                    if ((index_exo + 1) * (rest_time + exercices_time) < time_cycle) {
-                        exercises.push({ id: 0, name: "rest", type: 1, time: rest_time, time_inf: false })
-                    }
-                    index_exo++;
-                }
-                break;
-            case 2: //Pyramide all cycle we change the 
-                break;
-            case 3: // Serie Exo (add rest time beteewn exo)
-                for (let exo = 0; exo < lengthItem; exo++) {
-                    exercises.push({ id: items[exo].id, name: items[exo].name, type: 1, time:items[exo].time , time_inf: items[exo].time_inf });
-                    if (exo < lengthItem - 1) {
-                        exercises.push({ id: 0, name: "rest", type: 1, time: rest_time, time_inf: false })
-                    }
-                }
-                break;
-            case 4:  // Full Custom
-                const items_transforming = [];
-                items.forEach(item => {
-                    if (item.cycles > 0) {
+        
+             // Full Custom
+            var items_transforming = [];
+            items.forEach(item => {
+                if (item.cycles > 0) {
+                    items_transforming.push({
+                        id: item.id,
+                        name: item.name,
+                        time: item.time_inf ? 15 : item.time,
+                        time_inf: item.time_inf,
+                        type: 0,
+                    });
+                    for (let i = 1; i < item.cycles; i++) {
+                        items_transforming.push({
+                            id: item.id,
+                            name: "rest",
+                            time: item.time_bis,
+                            time_inf: false,
+                            type: 1,
+                        });
                         items_transforming.push({
                             id: item.id,
                             name: item.name,
-                            time:  item.time,
+                            time: item.time_inf ? 15 : item.time,
                             time_inf: item.time_inf,
                             type: 0,
                         });
-                        for (let i = 1; i < item.cycles; i++) {
-                            items_transforming.push({
-                                id: item.id,
-                                name: "rest",
-                                time: item.time_bis,
-                                time_inf: false,
-                                type: 1,
-                            });
-                            items_transforming.push({
-                                id: item.id,
-                                name: item.name,
-                                time:  item.time,
-                                time_inf: item.time_inf,
-                                type: 0,
-                            });
-                        }
-                    } else {
-                        items_transforming.push(item);
                     }
-                });
-                exercises = items_transforming;
-              
-                break;
-            default:
-                break;
+                } else {
+                    items_transforming.push(item);
+                }
+            }); 
+            items_transforming.forEach(item => {
+                item.time = item.time_inf ? 15 : item.time;
+            });
+            exercises = items_transforming;
+            time_total += items_transforming.reduce((acc, cur) => acc + cur.time, 0);
+               
 
-        }
-        exercises.forEach(item => {
-            item.time = item.time_inf ? 15 : item.time;
-        });  
-        time_total += exercises.reduce((acc, cur) => acc + cur.time, 0);
+           
         time_total *= cycles;
         time_total += (cycles - 1) * recovery;
         //send the message
         const payload = {
-            id : v4(),
+            id : exo.id,
             titre: titre,
-            date: Timestamp.now(),
+            date: exo.date,
             cycles: cycles,
             recovery_time: recovery,
-            type: type,
+            type: exo.type,
             description: description,
             rest_time: rest_time,
             exercises: exercises,
             useruid: user.uid,
             time_total: time_total,
         };
+      
         try {
             if (isPublic) {
-                const collectionRef = collection(db, "exercises");
-                await addDoc(collectionRef, payload);
+                console.log("0" + props.match.params.exoId);
+                const collectionRef = doc(db, "exercises", props.match.params.exoId);
+                await updateDoc(collectionRef, payload);
             }
             else {
+                console.log(exo.id);
                 const UserDocRef = doc(db, 'Users', user.uid);
-                await updateDoc(UserDocRef, { exercises: arrayUnion(payload) });
+                await updateDoc(UserDocRef, { exercises : exos.filter(e => e.id !== exo.id) });
+                await updateDoc(UserDocRef, { exercises : arrayUnion(payload) });
+
             }
             console.log("addDoc success");
             setAlert({
@@ -342,32 +405,18 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                 message: "Network error or user error"
             });
         }
-
-
     }
 
 
     return (
         <div className='AuthPage'>
             {user ? <>
-                <h1 className='Titre2' >Create your own tailor-made sports session</h1>
+                <h1 className='Titre2' >Update your session</h1>
                 <div className="NewExoPage-content">
                     <div className='NewExoPage-content-form' style={{ "maxWidth": "700px" }}>
                         <Form noValidate validated={validated} onSubmit={handleSubmit}>
-                            <Row className="mb-3" style={{"marginRight":"1vw","marginLeft":"1vw"}}>
-                                <Form.Select  value={type} onChange={(e) => setType(parseInt(e.target.value))}
-                                    aria-label="Default select example"
-                                    required
-                                >
-                                    {data.map((item, index) => (
-                                        <option key={index} value={item.id}>{item.name}</option>
-                                    ))}
-                                </Form.Select>
-                                <Form.Text className="text-muted" >
-                                    {data[type].description}
-                                </Form.Text>
-                            </Row>
-                            {type === 0 || type === 2 ? <></> : <>
+                            
+                            
                                 <Row className="mb-3">
                                     <Form.Group as={Col} controlId="titreid">
                                         <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Titre</Form.Label>
@@ -399,6 +448,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                             disabled={cycles === 1}
                                             type="time"
                                             placeholder="min:sec"
+                                            value={ ((recovery-recovery%60)/60).toString().padStart(2,"0") + ":"+ (recovery%60).toString().padStart(2, "0")}
                                             onChange={(e) => {
                                                 var tab = e.target.value.split(":").map(Number)
                                                 setRecovery(tab[0] * 60 + tab[1])
@@ -416,57 +466,19 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                         onChange={(e) => setDescription(e.target.value)}
                                     />
                                 </FloatingLabel>
-                                {type !== 4 ? <>
-                                    <Row className="mb-3">
-                                        <Form.Group as={Col} controlId="exotimeid">
-                                            <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Exercise time</Form.Label>
-                                            <Form.Control
-                                                size='sm'
-                                                required
-                                                type="number"
-                                                placeholder="in seconds"
-                                                disabled={type === 3}
-                                                value={exercices_time ? exercices_time : ""}
-                                                onChange={(e) => setExercices_time(parseInt(e.target.value))}
-                                            />
-                                        </Form.Group>
-                                        <Form.Group as={Col} controlId="resttimeid">
-                                            <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Rest Time</Form.Label>
-                                            <Form.Control
-                                                size='sm'
-                                                required
-                                                type="number"
-                                                placeholder="in seconds"
-                                                value={rest_time ? rest_time : ""}
-                                                onChange={(e) => setRest_time(parseInt(e.target.value))}
-                                            />
-                                        </Form.Group>
-                                        <Form.Group as={Col} controlId="nbpercycle">
-                                            <Form.Label style={{ "fontSize": "80%", "marginBottom": "0px" }}>Time of 1 Cycle</Form.Label>
-                                            <Form.Control
-                                                size='sm'
-                                                required
-                                                placeholder="min:sec"
-                                                disabled={type === 3}
-                                                type="time"
-                                                onChange={(e) => {
-                                                    var tab = e.target.value.split(":").map(Number)
-                                                    setTime_cycle(tab[0] * 60 + tab[1])
-                                                }}
-                                            />
-                                        </Form.Group>
-                                    </Row>
-                                </> : null}
+                               
                                 <h1 className='Titre3' >List of exercises : {items.length}</h1>
                                 <div >
-                                    <RLDD
+                                <RLDD
                                         cssClasses=""
                                         items={items}
-                                        itemRenderer={itemRenderer}
+                                        itemRenderer={ItemRenderer}
                                         onChange={handleRLDDChange}
                                     />
+
+                                
                                 </div>
-                                {type === 4 ? <>
+                               
                                     <div>
                                         <Button variant="btn btn-outline-secondary" style={{
                                             "width": "80%",
@@ -483,7 +495,7 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                             Add Cycle
                                         </Button>
                                     </div>
-                                </> : null}
+                                
                                 <div>
                                     <Button variant="btn btn-outline-secondary" style={{
                                         "width": "80%",
@@ -492,20 +504,10 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
                                         Add Exercise
                                     </Button>
                                 </div>
-                                {perm ?
-                                    <Row className="mb-3" style={{ "textAlign": "left", "marginLeft": "20px" }} >
-                                        <Form.Check
-                                            type="switch"
-                                            id="custom-switchpublic"
-                                            label="Session Public"
-                                            onChange={(e) => setIsPublic(e.target.checked)}
-                                        />
-                                    </Row>
-                                    : null}
                                 <Button variant="btn btn-outline-success" type="submit">
-                                    Submit
+                                    Update
                                 </Button>
-                            </>}
+                            
                         </Form>
                     </div>
                 </div>
@@ -525,4 +527,4 @@ const ChronoForm: React.FunctionComponent<IPage> = props => {
 
 }
 
-export default ChronoForm;
+export default UpdateExoPage;

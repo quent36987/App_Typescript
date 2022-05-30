@@ -25,8 +25,6 @@ const DashBoardAdminPage: React.FunctionComponent<IPage> = props => {
 
 
     
-    
-
     useEffect(() => {
         logging.info(`Loading ${props.name}`);
         const collectionRef = collection(db, "exercises").withConverter<Exo>(ExoConverter);
@@ -82,14 +80,29 @@ const DashBoardAdminPage: React.FunctionComponent<IPage> = props => {
         const list_exo_name: ItemExo[] = [];
         list_exo.forEach((exo) => {
             exo.exercises.forEach((exo_name) => {
-                if (!list_exo_name.find((item) => item.name === exo_name.name)) {
+                if (!list_exo_name.find((item) => StringSymplify(item.name) === StringSymplify(exo_name.name))) {
+                    var url = findUrl(exo_name.name);
+                    if (url)
+                    {
                     list_exo_name.push(
                         {
                             name: exo_name.name,
-                            idurl: findUrl(exo_name.name)?.id,
-                            url: findUrl(exo_name.name)?.url
+                            idurl: url.id,
+                            url: url.url,
                         }
                     );
+                    }
+                    else
+                    {
+                        //insert au debut
+                        list_exo_name.unshift(
+                            {
+                                name: exo_name.name,
+                                idurl: undefined,
+                                url: undefined,
+                            }
+                        );
+                    }
                 }
             })
         })
@@ -148,9 +161,10 @@ const DashBoardAdminPage: React.FunctionComponent<IPage> = props => {
                          <div className="itemdashboard" style={{"width":"10vw"}}>
                             <select disabled={exo.url !== undefined} onChange={(e) => changeselect(exo.name,e.target.value)} >
                                 {itemexo.map((exoo) => {
+                                    if (StringSymplify(exoo.name) !== StringSymplify(exo.name) && exoo.url !== undefined) {
                                     return (
                                         <option  value={exoo.url}>{exoo.name}</option>
-                                    )
+                                    )}
                                 })}
                             </select>
                         </div>

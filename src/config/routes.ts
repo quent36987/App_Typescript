@@ -7,6 +7,7 @@ import ChronoListPage from '../pages/ChronoListPage';
 import ChronoForm from '../pages/NewExoPage';
 import DashBoardAdminPage from '../pages/DashBoardAdmin';
 import TimerPage from '../pages/TimerPage';
+import UpdateExoPage from '../pages/UpdateExoPage';
 
 const routes: IRoute[] = [
     {
@@ -55,6 +56,12 @@ const routes: IRoute[] = [
         path: '/timer',
         name: 'Timer Page',
         component: TimerPage,
+        exact: true
+    },
+    {
+        path: '/updateform/:exoId',
+        name: 'Update Form Page',
+        component: UpdateExoPage,
         exact: true
     }
 ]

@@ -58,7 +58,7 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
     const handleShow = () => setShow(true);
 
     const { user, setAlert } = AppState();
-    const { isSupported, released, request, release } = useWakeLock(); 
+    const { request } = useWakeLock(); 
 
     useEffect(() => {
         async function getdata() {
