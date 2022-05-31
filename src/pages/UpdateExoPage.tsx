@@ -73,7 +73,9 @@ const UpdateExoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> =
                 const ref = doc(db, "exercises", props.match.params.exoId).withConverter(ExoConverter);
                 const docSnap = await getDoc(ref);
                 if (docSnap.exists()) {
-                    setExo(docSnap.data());
+                    var data = docSnap.data();
+                    data.id = docSnap.id;
+                    setExo(data);
                     setIsPublic(true);
                 } else {
                     if (user) {
@@ -349,7 +351,13 @@ const UpdateExoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> =
                         });
                     }
                 } else {
-                    items_transforming.push(item);
+                    items_transforming.push({ 
+                        id: item.id,
+                        name: item.name,
+                        time: item.time_inf ? 15 : item.time,
+                        time_inf: item.time_inf,
+                        type: item.type,
+                    });
                 }
             }); 
             items_transforming.forEach(item => {
@@ -377,6 +385,7 @@ const UpdateExoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> =
             time_total: time_total,
         };
       
+        console.log(payload); 
         try {
             if (isPublic) {
                 console.log("0" + props.match.params.exoId);

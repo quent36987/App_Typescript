@@ -5,9 +5,10 @@ import ChronoPage from '../pages/ChronoPage';
 import AuthPage from '../pages/AuthPage';
 import ChronoListPage from '../pages/ChronoListPage';
 import ChronoForm from '../pages/NewExoPage';
-import DashBoardAdminPage from '../pages/DashBoardAdmin';
+import DashBoardAdminPage from '../pages/AdminDashboard/DashBoardAdmin';
 import TimerPage from '../pages/TimerPage';
 import UpdateExoPage from '../pages/UpdateExoPage';
+import DashBoardExoList from '../pages/AdminDashboard/DashBoardExoList';
 
 const routes: IRoute[] = [
     {
@@ -50,6 +51,12 @@ const routes: IRoute[] = [
         path: '/dashboard',
         name: 'DashBoard Page',
         component: DashBoardAdminPage,
+        exact: true
+    },
+    {
+        path: '/dashboard2',
+        name: 'DashBoard Page 2',
+        component: DashBoardExoList,
         exact: true
     },
     {

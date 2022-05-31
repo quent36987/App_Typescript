@@ -13,6 +13,12 @@ export function StringSymplify(name : string)
 }
 
 export function formatTime(time: number) {
+    if (time === -1) {
+        return "♾";
+    }
+    if (time === -2) {
+        return "Finished !"
+    }
     const minutes = Math.floor(time / 60);
     let seconds = time % 60;
     if (seconds < 10) {

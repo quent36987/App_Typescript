@@ -1,12 +1,13 @@
 import { addDoc, arrayUnion, collection, doc, onSnapshot, query, Timestamp, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import logging from "../config/logging";
-import { Exo, ExoConverter } from "../data/ExoClass";
-import { ImageClass, ImageConverter } from "../data/ImageClass";
-import { db } from "../firebase";
-import IPage from "../interfaces/page";
-import { StringSymplify } from "../Utils/utils";
-import './allPage.css';
+import logging from "../../config/logging";
+import { Exo, ExoConverter } from "../../data/ExoClass";
+import { ImageClass, ImageConverter } from "../../data/ImageClass";
+import { db } from "../../firebase";
+import IPage from "../../interfaces/page";
+import { StringSymplify } from "../../Utils/utils";
+import './../allPage.css';
+
 
 
 type ItemExo =

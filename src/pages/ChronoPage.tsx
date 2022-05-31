@@ -12,6 +12,7 @@ import { User, UserConverter } from '../data/UserClass';
 import SearchImage from '../componants/SearchImage';
 import bipsrc from '../assets/bip.ogg';
 import { useWakeLock } from 'react-screen-wake-lock';
+import { formatTime } from '../Utils/utils';
 
 const dataButton = [
     {
@@ -42,6 +43,7 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
     const [_timming, setTimming] = useState(0);
 
     const [_cumulatedTime, setCumulatedTime] = useState(0);
+    const [_cumulatedTotalTime, setCumulatedTotalTime] = useState(0);
     const [_cumulatedTimebefore, setCumulatedTimeBefore] = useState(0);
 
     const [_is_pause, setIsPause] = useState(false);
@@ -126,7 +128,6 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
 
                 if (exo.exercises[_set].time_inf) {
                     setTime(-1);
-                    return;
                 }
             }
             else {
@@ -162,9 +163,13 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                         setIntern(c => { console.log(c); window.clearInterval(c); return c });
                         return 0;
                     }
+                    if (time <= -1) {
+                        return time;
+                    }
                     setCumulatedTime(c => c + 1);
                     return time - 1;
                 });
+                setCumulatedTotalTime(c => c + 1);
                 return pause;
             }
         });
@@ -195,25 +200,10 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
         setStartButton(1);
     }
 
-    function formatTime(time: number) {
-        if (time === -1) {
-            return "♾";
-        }
-        if (time === -2) {
-            return "Finished !"
-        }
-        const minutes = Math.floor(time / 60);
-        let seconds = time % 60;
-        if (seconds < 10) {
-            return `${minutes}:0${seconds}`
-        }
-        return `${minutes}:${seconds}`;
-    }
     async function saveChange() {
-        console.log("eee");
         if (user) {
             const UserDocRef = doc(db, 'Users', user.uid);
-            const payload = { exo_log: arrayUnion({ id: props.match.params.exoId, time: exo.time_total, date: Timestamp.now() }) };
+            const payload = { exo_log: arrayUnion({ id: props.match.params.exoId, time: _cumulatedTotalTime, date: Timestamp.now() }) };
             try {
                 await updateDoc(UserDocRef, payload);
             }
@@ -221,13 +211,8 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                 console.log(error);
             }
         }
-        else {
-
-        }
         handleClose();
     };
-
-
 
 
     const Render = () => {
@@ -262,7 +247,7 @@ const ChronoPage: React.FunctionComponent<IPage & RouteComponentProps<any>> = pr
                         </div>
                         <div>
                             <span id="base-timer-label" className="base-timer__label">{formatTime(_time)}</span>
-                            <span id="base-timer-label2" className="base-timer__label2">{formatTime(_cumulatedTime)}</span>
+                            <span id="base-timer-label2" className="base-timer__label2">{formatTime(_cumulatedTotalTime)}</span>
                         </div>
                         <ProgressBar style={{ "marginBottom": "1vh" }} animated striped variant={_progressbarcolor}
                             now={(_time / _timming) * 100} />
